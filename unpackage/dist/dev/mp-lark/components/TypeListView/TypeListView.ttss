@@ -1,0 +1,7 @@
+.gear_list {
+  height: 100%;
+}
+.gear_list .scroll_view {
+  height: 100%;
+  background-color: #F4F6F7;
+}

@@ -1,0 +1,26 @@
+"use strict";
+var common_vendor = require("../../common/vendor.js");
+const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  props: {
+    bgColor: { type: null, required: false },
+    info: { type: null, required: true }
+  },
+  setup(__props) {
+    common_vendor.ref();
+    return (_ctx, _cache) => {
+      return common_vendor.e({
+        a: common_vendor.t(__props.info.nickname || ""),
+        b: __props.info.lentAt
+      }, __props.info.lentAt ? {
+        c: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.lentAt).format("MM-DD HH:mm"))
+      } : {
+        d: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.pendingLentAt).format("MM-DD HH:mm")),
+        e: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.pendingReturnAt).format("MM-DD HH:mm"))
+      }, {
+        f: __props.bgColor
+      });
+    };
+  }
+});
+var Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__file", "/Users/ysjf-jimmy/Documents/HBuilderProjects/\u5E93\u5B58\u7BA1\u7406/components/OrderItem/OrderItem.vue"]]);
+tt.createComponent(Component);

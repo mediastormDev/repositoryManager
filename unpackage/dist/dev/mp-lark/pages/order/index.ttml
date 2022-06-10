@@ -1,0 +1,1 @@
+<view class="tabs_view"><view bindtap="{{a}}" class="{{('tab') + ' ' + (b && 'selected')}}">我的工单</view><view bindtap="{{c}}" class="{{('tab') + ' ' + (d && 'selected')}}">归还设备</view></view><view><my-orders-view bind:-data-c-h="{{!e}}" u-i="6acf1b90-0" bind:__l="__l"/><my-returns-view bind:-data-c-h="{{!f}}" u-i="6acf1b90-1" bind:__l="__l"/></view>

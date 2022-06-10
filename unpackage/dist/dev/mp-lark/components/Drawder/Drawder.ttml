@@ -1,0 +1,1 @@
+<view tt:if="{{a}}" class="drawer_bg" bindtap="{{d}}"><view tt:if="{{b}}" class="drawer_body" catchtap="{{c}}"><slot></slot></view></view>

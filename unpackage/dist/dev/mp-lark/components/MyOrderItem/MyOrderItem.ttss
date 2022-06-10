@@ -1,0 +1,36 @@
+.my_order_view {
+  padding: 10px 10px 20px 10px;
+  background-color: white;
+  margin-top: 10px;
+}
+.my_order_view .order_date {
+  font-size: 14px;
+  font-weight: 400;
+  color: #24252C;
+}
+.my_order_view .order_footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.my_order_view .order_footer .footer_title {
+  font-size: 14px;
+  font-weight: 400;
+  color: #24252C;
+}
+.my_order_view .modify_btn {
+  border-radius: 10px;
+  border: 1px solid #D8D8D8;
+  font-size: 14px;
+  font-weight: 600;
+  color: #24252C;
+  background-color: white;
+}
+.my_order_view .return_btn {
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #A2662A;
+  background-color: #FFDA71;
+}

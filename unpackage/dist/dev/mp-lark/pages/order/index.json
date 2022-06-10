@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "工单",
+  "usingComponents": {
+    "my-orders-view": "../../components/MyOrders/MyOrders",
+    "my-returns-view": "../../components/MyReturns/MyReturns"
+  }
+}

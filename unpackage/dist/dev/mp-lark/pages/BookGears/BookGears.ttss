@@ -1,0 +1,64 @@
+.gear_list_view {
+  background-color: white;
+  padding: 10px 15px 10px 10px;
+}
+.gear_list_view .gear_list_item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.gear_list_view .gear_list_item + .gear_list_item {
+  margin-top: 20px;
+}
+.default_text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #D8D8D8;
+}
+.select_view {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #24252C;
+  background-color: white;
+}
+.select_view .input_view {
+  display: flex;
+  align-items: center;
+}
+.booked_view {
+  padding: 10px;
+}
+.booked_view .notice {
+  font-size: 11px;
+  font-weight: 600;
+  color: #646464;
+  margin: 10px 10px 15px 10px;
+}
+.booked_view .strong_text {
+  color: #FF2B5B;
+}
+.booked_list .booked_list_item .title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #24252C;
+  margin-left: 10px;
+}
+.book_button_view {
+  background-color: white;
+  padding: 10px;
+  padding-bottom: 44px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.book_button_view .book_button {
+  background: #FC6294;
+  border-radius: 10px;
+  border: none;
+  color: white;
+}

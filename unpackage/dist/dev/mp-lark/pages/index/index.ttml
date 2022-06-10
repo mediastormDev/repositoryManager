@@ -1,0 +1,1 @@
+<view class="content"><gear-list-view u-i="b54e0288-0" bind:__l="__l"/><gear-item-list style="flex:1" u-i="b54e0288-1" bind:__l="__l"/></view>

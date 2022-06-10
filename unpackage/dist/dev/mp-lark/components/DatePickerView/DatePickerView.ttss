@@ -1,0 +1,14 @@
+.datepicker_view {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+}
+.datepicker_view .date_btn_view {
+  display: flex;
+  align-items: center;
+}
+.datepicker_view .date_btn_view > button {
+  flex: 1;
+}

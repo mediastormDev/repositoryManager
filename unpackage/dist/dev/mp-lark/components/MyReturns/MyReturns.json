@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "my-return-item-view": "../MyReturnItem/MyReturnItem"
+  }
+}

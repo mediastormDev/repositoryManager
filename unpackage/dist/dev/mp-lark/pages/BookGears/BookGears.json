@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "设备预约",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "gear-info-view": "../../components/GearInfoView/GearInfoView",
+    "date-picker-view": "../../components/DatePickerView/DatePickerView",
+    "order-item-view": "../../components/OrderItem/OrderItem"
+  }
+}
