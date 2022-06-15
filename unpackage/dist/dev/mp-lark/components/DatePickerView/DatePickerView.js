@@ -19,15 +19,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const day = days.value[val[1]];
       const hour = hours.value[val[2]];
       const minute = minutes.value[val[3]];
-      console.log(`${date.value.getFullYear()}/${month}/${day} ${hour}:${minute}:00`);
       result.value = new Date(`${date.value.getFullYear()}/${month}/${day} ${hour}:${minute}:00`).getTime();
-      console.log("valuevalue", value.value);
     };
     const onConfirm = () => {
       emit("onConfirm", result.value);
       closePicker();
     };
-    const openPicker = () => {
+    const calcTime = (time) => {
+      const month = common_vendor.dayjs(time).month();
+      const date2 = common_vendor.dayjs(time).date();
+      const hour = common_vendor.dayjs(time).hour();
+      const minute = common_vendor.dayjs(time).minute();
+      value.value = [month, Math.max(date2 - 1, 0), Math.max(hour - 1, 0), Math.max(minute - 1, 0)];
+    };
+    const openPicker = (oldDate) => {
+      if (oldDate) {
+        calcTime(oldDate);
+      } else {
+        calcTime(common_vendor.dayjs());
+        result.value = common_vendor.dayjs().format("YYYY/MM/DD HH:mm:00");
+      }
       show.value = true;
     };
     const closePicker = () => {
@@ -57,27 +68,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, show.value ? {
         b: common_vendor.o(closePicker),
         c: common_vendor.o(onConfirm),
-        d: common_vendor.f(months.value, (month, k0, i0) => {
+        d: common_vendor.t(_ctx.oldDate),
+        e: common_vendor.f(months.value, (month, k0, i0) => {
           return {
             a: common_vendor.t(month)
           };
         }),
-        e: common_vendor.f(days.value, (day, k0, i0) => {
+        f: common_vendor.f(days.value, (day, k0, i0) => {
           return {
             a: common_vendor.t(day)
           };
         }),
-        f: common_vendor.f(hours.value, (hour, k0, i0) => {
+        g: common_vendor.f(hours.value, (hour, k0, i0) => {
           return {
             a: common_vendor.t(hour)
           };
         }),
-        g: common_vendor.f(minutes.value, (min, k0, i0) => {
+        h: common_vendor.f(minutes.value, (min, k0, i0) => {
           return {
             a: common_vendor.t(min)
           };
         }),
-        h: common_vendor.o(bindChange)
+        i: value.value,
+        j: common_vendor.o(bindChange)
       } : {});
     };
   }

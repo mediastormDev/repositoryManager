@@ -1,0 +1,37 @@
+.filter_view.data-v-fe442d38 {
+  z-index: 3;
+  background-color: white;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.select_text.data-v-fe442d38 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #24252C;
+}
+.select_view.data-v-fe442d38 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #24252C;
+  background-color: white;
+}
+.select_view .input_view.data-v-fe442d38 {
+  display: flex;
+  align-items: center;
+}
+.chooseColor.data-v-fe442d38 {
+  color: #ff8389;
+}
+.date_btn_view.data-v-fe442d38 {
+  display: flex;
+  align-items: center;
+}
+.date_btn_view > button.data-v-fe442d38 {
+  flex: 1;
+}

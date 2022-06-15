@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "admin-borrow-item": "../AdminBorrowItem/AdminBorrowItem"
+  }
+}

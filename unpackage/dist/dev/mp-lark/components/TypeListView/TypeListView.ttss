@@ -2,6 +2,6 @@
   height: 100%;
 }
 .gear_list .scroll_view {
-  height: 100%;
+  height: 100vh;
   background-color: #F4F6F7;
 }

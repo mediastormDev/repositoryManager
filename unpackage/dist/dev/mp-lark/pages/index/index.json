@@ -2,6 +2,7 @@
   "navigationBarTitleText": "设备列表",
   "usingComponents": {
     "gear-list-view": "../../components/TypeListView/TypeListView",
-    "gear-item-list": "../../components/GearItemList/GearItemList"
+    "gear-item-list": "../../components/GearItemList/GearItemList",
+    "gear-filters": "../../components/GearFilter/GearFilter"
   }
 }

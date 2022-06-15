@@ -1,1 +1,1 @@
-<view><view style="margin-top:10px"><my-return-item-view u-i="49f63f64-0" bind:__l="__l"/></view><view style="margin-top:10px"><my-return-item-view u-i="49f63f64-1" bind:__l="__l"/></view><view style="margin-top:10px"><my-return-item-view u-i="49f63f64-2" bind:__l="__l"/></view><view style="margin-top:10px"><my-return-item-view u-i="49f63f64-3" bind:__l="__l"/></view></view>
+<view><view tt:for="{{a}}" tt:for-item="borrow" tt:key="c" style="margin-top:10px"><my-return-item-view tt:if="{{borrow.b}}" u-i="{{borrow.a}}" bind:__l="__l" u-p="{{borrow.b}}"/></view></view>

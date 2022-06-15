@@ -4,7 +4,8 @@ import {
 } from '@/common/http/index.js';
 
 const {
-	token
+	token,
+	openId
 } = UseToken();
 
 export const login = (code) => {
@@ -21,6 +22,7 @@ export const login = (code) => {
 export const getMyprofile = () => {
 	return request('/api/auth/profile', {}, 'GET').then(res => {
 		console.log('profile', res);
+		openId.value = res.user.open_id;
 	})
 }
 

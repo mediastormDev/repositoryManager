@@ -4,8 +4,9 @@
 			<button @click="closePicker">取消</button>
 			<button @click="onConfirm">确认</button>
 		</view>
+		<view>{{oldDate}}</view>
 		<picker-view indicator-style="height: 50px;color:black;" mask-style="z-index: 0;" style="height: 750rpx;"
-			value="value" @change="bindChange">
+			:value="value" @change="bindChange">
 			<picker-view-column style="text-align: center;">
 				<view v-for="month in months" style="line-height: 50px; text-align: center;">{{month}}月</view>
 			</picker-view-column>
@@ -27,6 +28,7 @@
 		onMounted,
 		ref
 	} from 'vue';
+	import dayjs from 'dayjs';
 
 	const date = ref(new Date());
 	const months = ref([]);
@@ -36,7 +38,7 @@
 	const value = ref();
 	const result = ref();
 	const show = ref(false);
-	
+
 	const emit = defineEmits(['onConfirm'])
 
 	const bindChange = (e) => {
@@ -48,17 +50,30 @@
 		const hour = hours.value[val[2]];
 		const minute = minutes.value[val[3]];
 
-		console.log(`${date.value.getFullYear()}/${month}/${day} ${hour}:${minute}:00`);
 		result.value = new Date(`${date.value.getFullYear()}/${month}/${day} ${hour}:${minute}:00`).getTime();
-		console.log('valuevalue', value.value)
 	}
-	
+
 	const onConfirm = () => {
 		emit('onConfirm', result.value);
 		closePicker();
 	}
 
-	const openPicker = () => {
+	const calcTime = (time) => {
+		const month = dayjs(time).month();
+		const date = dayjs(time).date();
+		const hour = dayjs(time).hour();
+		const minute = dayjs(time).minute();
+
+		value.value = [month, Math.max(date - 1, 0), Math.max(hour - 1, 0), Math.max(minute - 1, 0)];
+	}
+
+	const openPicker = (oldDate) => {
+		if (oldDate) {
+			calcTime(oldDate);
+		} else {
+			calcTime(dayjs());
+			result.value = dayjs().format('YYYY/MM/DD HH:mm:00')
+		}
 		show.value = true;
 	}
 
@@ -94,6 +109,7 @@
 		left: 0;
 		right: 0;
 		background-color: white;
+		z-index: 10;
 
 		.date_btn_view {
 			display: flex;

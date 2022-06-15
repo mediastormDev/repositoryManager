@@ -4,6 +4,7 @@
   left: 0;
   right: 0;
   background-color: white;
+  z-index: 10;
 }
 .datepicker_view .date_btn_view {
   display: flex;

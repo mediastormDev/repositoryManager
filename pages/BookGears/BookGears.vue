@@ -1,17 +1,26 @@
 <template>
 	<view class="gear_list_view">
-		<view class="gear_list_item" v-for="gear in gearList" :key="gear._id">
+		<view class="gear_list_item" v-for="(gear,index) in gearList" :key="gear._id">
 			<GearInfoView :gear="gear" />
-			<icon v-if="gearList.length !== 1" type="clear"></icon>
+			<image @click="removeGearByClick(gear, index)" v-if="gearList.length !== 1" src="../../static/close.png"
+				style="width: 20px;height: 20px;" mode=""></image>
 		</view>
 	</view>
 	<view style="margin-top: 20px;">
+		<view v-if="isAdmin" class="select_view">
+			<view class="title">使用者</view>
+			<view class="input_view" @click="selectUser">
+				<view v-if="adminChooseUser">{{adminChooseUser.openId}}</view>
+				<view v-else class="default_text">请选择</view>
+				<image src="../../static/enter.png" style="width: 20px;height: 20px;" mode=""></image>
+			</view>
+		</view>
 		<view class="select_view">
 			<view class="title">开始时间</view>
 			<view class="input_view" @click="selectStartTime">
 				<view v-if="startDate">{{startDate && dayjs(startDate).format('MM月DD日 HH:mm')}}</view>
 				<view v-else class="default_text">请选择</view>
-				<icon type="cancel"></icon>
+				<image src="../../static/enter.png" style="width: 20px;height: 20px;" mode=""></image>
 			</view>
 		</view>
 		<view class="select_view">
@@ -19,7 +28,7 @@
 			<view class="input_view" @click="selectEndTime">
 				<view v-if="endDate">{{ endDate && dayjs(endDate).format('MM月DD日 HH:mm')}}</view>
 				<view v-else class="default_text">请选择</view>
-				<icon type="cancel"></icon>
+				<image src="../../static/enter.png" style="width: 20px;height: 20px;" mode=""></image>
 			</view>
 		</view>
 		<view class="select_view">
@@ -27,7 +36,7 @@
 			<view class="input_view">
 				<view v-if="startDate && endDate && !disableBtn">{{timeDiff}}</view>
 				<view v-else class="default_text">选择起止时间后计算</view>
-				<icon type="cancel"></icon>
+				<image src="../../static/enter.png" style="width: 20px;height: 20px;" mode=""></image>
 			</view>
 		</view>
 	</view>
@@ -41,8 +50,11 @@
 			</view>
 		</view>
 	</view>
+	<view style="height: 200px;"></view>
 	<view class="book_button_view">
-		<button class="book_button" :disabled="disableBtn" @click="pressBook">立即预约</button>
+		<button class="book_button" v-if="ticketInfo && ticketInfo._id" @click="cancelBook">取消预约</button>
+		<button v-if="!isAdmin" class="book_button" :disabled="disableBtn" @click="pressBook">{{ticketInfo?'修改':'立即'}}预约</button>
+		<button v-if="isAdmin" class="book_button" :disabled="disableBtn" @click="pressBookAdmin">立即借出</button>
 	</view>
 	<DatePickerView @onConfirm="onDatePickerConfirm" ref="datePickerRef" />
 </template>
@@ -61,22 +73,36 @@
 		debounce
 	} from 'lodash';
 	import {
+		cancelTicket,
 		previewTicket,
-		createTicket
+		createTicket,
+		updateTickeDate,
+		removeGear
 	} from '@/common/apis/ticket.js';
+	import {
+		adminBorrow
+	} from '@/common/apis/borrow.js';
+	import UseToken from '../../composables/UseToken.js';
 
+	const {
+		isAdmin,
+		openId
+	} = UseToken();
+
+	const adminChooseUser = ref();
 	const datePickerRef = ref(null);
 	const startDate = ref('');
 	const endDate = ref('');
 	const gearList = ref([]);
 	const bookInfo = ref([]);
+	const ticketInfo = ref();
 	const disableBtn = ref(false);
 
 	const timeDiff = computed(() => {
 		return timeDifference(startDate.value, endDate.value)
 	})
 
-	let selectDateType = 0
+	let selectDateType = 0;
 
 	const timeDifference = (startTime, endTime) => { //可以传日期时间或时间戳
 		let start = typeof(startTime) == "number" ? startTime : new Date(startTime).getTime(),
@@ -92,15 +118,32 @@
 		return `${days}天${hours}小时${minutes}分`
 	}
 
+	const selectUser = debounce(() => {
+		tt.chooseContact({
+			multi: false,
+			ignore: false,
+			maxNum: 1,
+			limitTips: "选择人数达到上限了",
+			enableChooseDepartment: true,
+			success(res) {
+				console.log(JSON.stringify(res));
+				adminChooseUser.value = res.data[0];
+			},
+			fail(res) {
+				console.log(`chooseContact fail: ${JSON.stringify(res)}`);
+			}
+		});
+	}, 100)
+
 	const selectStartTime = () => {
 		console.log('click show picker')
 		selectDateType = 0;
-		datePickerRef.value && datePickerRef.value.openPicker();
+		datePickerRef.value && datePickerRef.value.openPicker(startDate.value);
 	}
 
 	const selectEndTime = () => {
 		selectDateType = 1;
-		datePickerRef.value && datePickerRef.value.openPicker();
+		datePickerRef.value && datePickerRef.value.openPicker(endDate.value);
 	}
 
 	const onDatePickerConfirm = (date: String) => {
@@ -143,47 +186,158 @@
 		}
 	}
 
-	const previewIfBooked = () => {
-		const barcodes = gearList.value.map(item => item.barcode);
-		previewTicket(barcodes, startDate.value, endDate.value).then(res => {
-			const temp = res.map(booked => {
-				gearList.value.map(gear => {
-					if (gear.barcode == booked.barcode) {
-						booked.gear = gear;
-						gear.booked = true;
-					}
-				})
-				return booked
+	const removeGearByClick = (gear, index) => {
+		console.log('gear', gear);
+		if (ticketInfo.value) {
+			removeGear(ticketInfo.value._id, gear.borrowId).then(res => {
+				gearList.value.splice(index, 1)
 			})
-			bookInfo.value = temp;
-			return bookInfo;
-		})
+		} else {
+			gearList.value.splice(index, 1)
+		}
 	}
+
+	const previewIfBooked = () => {
+		const barcodes = gearList.value.map(item => {
+			item.booked = false;
+			return item.barcode;
+		});
+		if (ticketInfo.value && ticketInfo.value._id) {
+			previewTicket(barcodes, startDate.value, endDate.value, ticketInfo.value._id).then(res => {
+				const temp = res.map(booked => {
+					gearList.value.map(gear => {
+						if (gear.barcode == booked.barcode) {
+							booked.gear = gear;
+							gear.booked = true;
+						}
+					})
+					return booked
+				})
+				bookInfo.value = temp;
+				return bookInfo;
+			})
+		} else {
+			previewTicket(barcodes, startDate.value, endDate.value, '').then(res => {
+				const temp = res.map(booked => {
+					gearList.value.map(gear => {
+						if (gear.barcode == booked.barcode) {
+							booked.gear = gear;
+							gear.booked = true;
+						}
+					})
+					return booked
+				})
+				bookInfo.value = temp;
+				return bookInfo;
+			})
+		}
+
+	}
+
+	const pressBookAdmin = debounce(() => {
+		if (!startDate.value || !endDate.value) {
+			uni.showToast({
+				title: '未选择时间'
+			})
+			return;
+		}
+		if (!adminChooseUser.value) {
+			uni.showToast({
+				title: '未选择领用人'
+			})
+			return;
+		}
+		const barcodes = gearList.value.filter(item => !item.booked).map(item => item.barcode);
+		console.log('barcodes', barcodes);
+		console.log('startDate', startDate.value);
+		console.log('endDate', endDate.value);
+		adminBorrow({
+			barcodes,
+			openId: adminChooseUser.value.openId,
+			pendingLentAt: startDate.value,
+			pendingReturnAt: endDate.value
+		}).then(res => {
+			uni.showToast({
+				title: '预定成功'
+			})
+			uni.navigateBack({
+
+			})
+		})
+	}, 100)
 
 	const pressBook = debounce(() => {
 		const barcodes = gearList.value.filter(item => !item.booked).map(item => item.barcode);
 		if (barcodes.length) {
-			createTicket(barcodes, startDate.value, endDate.value).then(res => {
-				console.log('createTicket', res);
-			})
+			if (ticketInfo.value && ticketInfo.value._id) {
+				updateTickeDate(ticketInfo.value._id, startDate.value, endDate.value).then(res => {
+					uni.showToast({
+						title: '预定成功'
+					})
+					uni.navigateBack({
+
+					})
+				})
+
+			} else {
+				createTicket(barcodes, startDate.value, endDate.value).then(res => {
+					console.log('createTicket', res);
+					uni.showToast({
+						title: '预定成功'
+					})
+					uni.navigateBack({
+
+					})
+				})
+			}
+
 		} else {
 			uni.showToast({
 				title: '时段有冲突',
 				icon: 'error'
 			})
 		}
+	}, 100)
 
+	const cancelBook = debounce(() => {
+		cancelTicket(ticketInfo.value._id).then(res => {
+			uni.navigateBack({
+
+			})
+		})
 	}, 100)
 
 	onMounted(() => {
-		uni.getStorage({
-			key: 'selectedGears',
-			success: (res) => {
-				gearList.value = res.data;
-				console.log('selectedGears', gearList.value)
-			}
-		})
-
+		const orderInfo = uni.getStorageSync('orderInfo');
+		const orderInfoMore = uni.getStorageSync('orderInfoMore');
+		console.log('orderInfo', orderInfo)
+		console.log('orderInfoMore', orderInfoMore)
+		if (orderInfo) {
+			gearList.value = orderInfo.borrows.map(item => {
+				item.asset.borrowId = item._id;
+				return item.asset;
+			});
+			startDate.value = orderInfo.pendingLentAt;
+			endDate.value = orderInfo.pendingReturnAt;
+			ticketInfo.value = orderInfo;
+			uni.removeStorageSync('orderInfo');
+		} else if (orderInfoMore) {
+			gearList.value = orderInfoMore.borrows.map(item => item.asset);
+			startDate.value = orderInfoMore.pendingLentAt;
+			endDate.value = orderInfoMore.pendingReturnAt;
+			ticketInfo.value = orderInfoMore;
+			ticketInfo.value._id = '';
+			uni.removeStorageSync('orderInfoMore');
+		} else {
+			uni.getStorage({
+				key: 'selectedGears',
+				success: (res) => {
+					gearList.value = res.data;
+					console.log('selectedGears', gearList.value)
+					uni.removeStorageSync('selectedGears');
+				}
+			})
+		}
 	})
 </script>
 
@@ -257,10 +411,16 @@
 		background-color: white;
 		padding: 10px;
 		padding-bottom: 44px;
-		position: absolute;
+		position: fixed;
 		bottom: 0;
 		left: 0;
 		right: 0;
+		display: flex;
+		align-items: center;
+
+		>button {
+			flex: 1;
+		}
 
 		.book_button {
 			background: #FC6294;

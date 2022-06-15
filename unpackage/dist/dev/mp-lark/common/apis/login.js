@@ -2,7 +2,8 @@
 var composables_UseToken = require("../../composables/UseToken.js");
 var common_http_index = require("../http/index.js");
 const {
-  token
+  token,
+  openId
 } = composables_UseToken.UseToken();
 const login = (code) => {
   return common_http_index.request("/api/auth/token", {
@@ -16,6 +17,7 @@ const login = (code) => {
 const getMyprofile = () => {
   return common_http_index.request("/api/auth/profile", {}, "GET").then((res) => {
     console.log("profile", res);
+    openId.value = res.user.open_id;
   });
 };
 exports.getMyprofile = getMyprofile;

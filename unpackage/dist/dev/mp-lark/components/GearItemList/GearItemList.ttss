@@ -1,5 +1,5 @@
 .scroll_view.data-v-5df02184 {
-  height: 100%;
+  height: 100vh;
   background-color: white;
 }
 .scroll_view .grid_view.data-v-5df02184 {
@@ -55,11 +55,11 @@
 .scroll_view .grid_view .gear_item .gear_status.lend.data-v-5df02184 {
   background-color: #FF1C30;
 }
-.button_view.data-v-5df02184 {
+.button_view_2.data-v-5df02184 {
   display: flex;
   margin: 10px 0;
 }
-.button_view .coll_button.data-v-5df02184 {
+.button_view_2 .coll_button.data-v-5df02184 {
   border-radius: 10px;
   border: 1px solid #EEEEEE;
   color: #646464;
@@ -71,7 +71,7 @@
   text-align: center;
   margin-right: 6px;
 }
-.button_view .book_button.data-v-5df02184 {
+.button_view_2 .book_button.data-v-5df02184 {
   border-radius: 10px;
   border: none;
   color: white;

@@ -1,5 +1,5 @@
 <template>
-	<view class="order_item_view" :style="{backgroundColor: bgColor}">
+	<view class="order_item_view" v-if="info" :style="{backgroundColor: bgColor}">
 		<view class="name_text">{{info.nickname || ''}}</view>
 		<view class="content_text" v-if="info.lentAt">使用中：{{dayjs(info.lentAt).format('MM-DD HH:mm')}}</view>
 		<view class="content_text" v-else>已预约：{{dayjs(info.pendingLentAt).format('MM-DD HH:mm')}} -

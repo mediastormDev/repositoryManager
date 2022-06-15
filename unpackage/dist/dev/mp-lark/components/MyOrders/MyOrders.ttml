@@ -1,1 +1,1 @@
-<view><my-order-item u-i="62031958-0" bind:__l="__l"/><my-order-item u-i="62031958-1" bind:__l="__l"/><my-order-item u-i="62031958-2" bind:__l="__l"/></view>
+<view><my-order-item tt:for="{{a}}" tt:for-item="order" tt:key="a" u-i="{{order.b}}" bind:__l="__l" u-p="{{order.c}}"/></view>

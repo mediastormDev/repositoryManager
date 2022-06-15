@@ -17,6 +17,7 @@ const GearStatusString = {
 };
 const gearList = common_vendor.ref([]);
 const nowGearList = common_vendor.ref([]);
+const nowType = common_vendor.ref("");
 var UseGear = () => {
   const getAssetList = () => {
     return common_apis_assets.getAssets().then((res) => {
@@ -31,10 +32,27 @@ var UseGear = () => {
       });
     });
   };
-  const getMyAssetByType = (type) => {
-    return common_apis_assets.getAssetsByType(type).then((res) => {
+  const getMyAssetByType = (type, pendingLentAt, pendingReturnAt) => {
+    console.log("pendingLentAt", pendingLentAt, typeof pendingLentAt);
+    console.log("pendingReturnAt", pendingReturnAt);
+    if (pendingLentAt !== void 0 && pendingReturnAt !== void 0) {
+      return common_apis_assets.getAssetsByType(type, pendingLentAt, pendingReturnAt).then((res) => {
+        nowGearList.value = res;
+        console.log("nowGearList", nowGearList.value);
+        return res;
+      });
+    } else {
+      return common_apis_assets.getAssetsByType(type).then((res) => {
+        nowGearList.value = res;
+        console.log("nowGearList", nowGearList.value);
+        return res;
+      });
+    }
+  };
+  const getMyFavList = (pendingLentAt, pendingReturnAt) => {
+    return common_apis_assets.getFav(pendingLentAt, pendingReturnAt).then((res) => {
       nowGearList.value = res;
-      console.log("nowGearList", nowGearList.value);
+      console.log("fav", res);
       return res;
     });
   };
@@ -43,9 +61,11 @@ var UseGear = () => {
   };
   return {
     getAssetList,
+    getMyFavList,
     getMyAssetByType,
     getBookInfo,
     nowGearList,
+    nowType,
     gearList
   };
 };

@@ -1,1 +1,1 @@
-<view class="order_item_view" style="{{'background-color:' + f}}"><view class="name_text">{{a}}</view><view tt:if="{{b}}" class="content_text">使用中：{{c}}</view><view tt:else class="content_text">已预约：{{d}} - {{e}}</view></view>
+<view tt:if="{{a}}" class="order_item_view" style="{{'background-color:' + g}}"><view class="name_text">{{b}}</view><view tt:if="{{c}}" class="content_text">使用中：{{d}}</view><view tt:else class="content_text">已预约：{{e}} - {{f}}</view></view>

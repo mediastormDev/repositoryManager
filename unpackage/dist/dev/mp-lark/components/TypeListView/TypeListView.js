@@ -13,24 +13,41 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const {
       nowGearList,
+      getMyFavList,
       gearList,
+      nowType,
       getMyAssetByType
     } = composables_UseGear.UseGear();
     const typeList = common_vendor.ref([]);
     common_vendor.watch(gearList, (cur) => {
       console.log("cur", cur);
-      typeList.value = cur;
+      nowType.value = cur[0].name;
+      typeList.value = [{
+        name: "\u6536\u85CF",
+        selected: false
+      }, ...cur];
     });
     const loadAssetByType = (type) => {
       getMyAssetByType(type).then((res) => {
-        console.log("\u67D0\u7C7B\u578B\u7684\u8D44\u4EA7", res);
+        console.log("\u67D0\u7C7B\u578B\u7684\u8D44\u4EA7");
+      });
+    };
+    const loadMyFav = () => {
+      getMyFavList().then((res) => {
+        console.log("fav", res);
       });
     };
     const onSelectItem = (index) => {
       typeList.value.map((item, i) => {
         if (i === index) {
           item.selected = true;
-          loadAssetByType(item.name);
+          nowType.value = item.name;
+          console.log("nowType", nowType.value);
+          if (item.name == "\u6536\u85CF") {
+            loadMyFav();
+          } else {
+            loadAssetByType(item.name);
+          }
         } else {
           item.selected = false;
         }

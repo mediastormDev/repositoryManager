@@ -104,6 +104,208 @@ const toNumber = (val) => {
   const n = parseFloat(val);
   return isNaN(n) ? val : n;
 };
+const SLOT_DEFAULT_NAME = "d";
+const ON_SHOW = "onShow";
+const ON_HIDE = "onHide";
+const ON_LAUNCH = "onLaunch";
+const ON_ERROR = "onError";
+const ON_THEME_CHANGE = "onThemeChange";
+const ON_PAGE_NOT_FOUND = "onPageNotFound";
+const ON_UNHANDLE_REJECTION = "onUnhandledRejection";
+const ON_LOAD = "onLoad";
+const ON_READY = "onReady";
+const ON_UNLOAD = "onUnload";
+const ON_INIT = "onInit";
+const ON_SAVE_EXIT_STATE = "onSaveExitState";
+const ON_RESIZE = "onResize";
+const ON_BACK_PRESS = "onBackPress";
+const ON_PAGE_SCROLL = "onPageScroll";
+const ON_TAB_ITEM_TAP = "onTabItemTap";
+const ON_REACH_BOTTOM = "onReachBottom";
+const ON_PULL_DOWN_REFRESH = "onPullDownRefresh";
+const ON_SHARE_TIMELINE = "onShareTimeline";
+const ON_ADD_TO_FAVORITES = "onAddToFavorites";
+const ON_SHARE_APP_MESSAGE = "onShareAppMessage";
+const ON_NAVIGATION_BAR_BUTTON_TAP = "onNavigationBarButtonTap";
+const ON_NAVIGATION_BAR_SEARCH_INPUT_CLICKED = "onNavigationBarSearchInputClicked";
+const ON_NAVIGATION_BAR_SEARCH_INPUT_CHANGED = "onNavigationBarSearchInputChanged";
+const ON_NAVIGATION_BAR_SEARCH_INPUT_CONFIRMED = "onNavigationBarSearchInputConfirmed";
+const ON_NAVIGATION_BAR_SEARCH_INPUT_FOCUS_CHANGED = "onNavigationBarSearchInputFocusChanged";
+const customizeRE = /:/g;
+function customizeEvent(str) {
+  return camelize(str.replace(customizeRE, "-"));
+}
+function hasLeadingSlash(str) {
+  return str.indexOf("/") === 0;
+}
+function addLeadingSlash(str) {
+  return hasLeadingSlash(str) ? str : "/" + str;
+}
+const invokeArrayFns = (fns, arg) => {
+  let ret;
+  for (let i = 0; i < fns.length; i++) {
+    ret = fns[i](arg);
+  }
+  return ret;
+};
+function once(fn, ctx = null) {
+  let res;
+  return (...args) => {
+    if (fn) {
+      res = fn.apply(ctx, args);
+      fn = null;
+    }
+    return res;
+  };
+}
+function getValueByDataPath(obj, path) {
+  if (!isString(path)) {
+    return;
+  }
+  path = path.replace(/\[(\d+)\]/g, ".$1");
+  const parts = path.split(".");
+  let key = parts[0];
+  if (!obj) {
+    obj = {};
+  }
+  if (parts.length === 1) {
+    return obj[key];
+  }
+  return getValueByDataPath(obj[key], parts.slice(1).join("."));
+}
+const encode = encodeURIComponent;
+function stringifyQuery(obj, encodeStr = encode) {
+  const res = obj ? Object.keys(obj).map((key) => {
+    let val = obj[key];
+    if (typeof val === void 0 || val === null) {
+      val = "";
+    } else if (isPlainObject(val)) {
+      val = JSON.stringify(val);
+    }
+    return encodeStr(key) + "=" + encodeStr(val);
+  }).filter((x) => x.length > 0).join("&") : null;
+  return res ? `?${res}` : "";
+}
+class EventChannel {
+  constructor(id2, events) {
+    this.id = id2;
+    this.listener = {};
+    this.emitCache = {};
+    if (events) {
+      Object.keys(events).forEach((name) => {
+        this.on(name, events[name]);
+      });
+    }
+  }
+  emit(eventName, ...args) {
+    const fns = this.listener[eventName];
+    if (!fns) {
+      return (this.emitCache[eventName] || (this.emitCache[eventName] = [])).push(args);
+    }
+    fns.forEach((opt) => {
+      opt.fn.apply(opt.fn, args);
+    });
+    this.listener[eventName] = fns.filter((opt) => opt.type !== "once");
+  }
+  on(eventName, fn) {
+    this._addListener(eventName, "on", fn);
+    this._clearCache(eventName);
+  }
+  once(eventName, fn) {
+    this._addListener(eventName, "once", fn);
+    this._clearCache(eventName);
+  }
+  off(eventName, fn) {
+    const fns = this.listener[eventName];
+    if (!fns) {
+      return;
+    }
+    if (fn) {
+      for (let i = 0; i < fns.length; ) {
+        if (fns[i].fn === fn) {
+          fns.splice(i, 1);
+          i--;
+        }
+        i++;
+      }
+    } else {
+      delete this.listener[eventName];
+    }
+  }
+  _clearCache(eventName) {
+    const cacheArgs = this.emitCache[eventName];
+    if (cacheArgs) {
+      for (; cacheArgs.length > 0; ) {
+        this.emit.apply(this, [eventName, ...cacheArgs.shift()]);
+      }
+    }
+  }
+  _addListener(eventName, type, fn) {
+    (this.listener[eventName] || (this.listener[eventName] = [])).push({
+      fn,
+      type
+    });
+  }
+}
+const PAGE_HOOKS = [
+  ON_INIT,
+  ON_LOAD,
+  ON_SHOW,
+  ON_HIDE,
+  ON_UNLOAD,
+  ON_BACK_PRESS,
+  ON_PAGE_SCROLL,
+  ON_TAB_ITEM_TAP,
+  ON_REACH_BOTTOM,
+  ON_PULL_DOWN_REFRESH,
+  ON_SHARE_TIMELINE,
+  ON_SHARE_APP_MESSAGE,
+  ON_ADD_TO_FAVORITES,
+  ON_SAVE_EXIT_STATE,
+  ON_NAVIGATION_BAR_BUTTON_TAP,
+  ON_NAVIGATION_BAR_SEARCH_INPUT_CLICKED,
+  ON_NAVIGATION_BAR_SEARCH_INPUT_CHANGED,
+  ON_NAVIGATION_BAR_SEARCH_INPUT_CONFIRMED,
+  ON_NAVIGATION_BAR_SEARCH_INPUT_FOCUS_CHANGED
+];
+function isRootHook(name) {
+  return PAGE_HOOKS.indexOf(name) > -1;
+}
+const UniLifecycleHooks = [
+  ON_SHOW,
+  ON_HIDE,
+  ON_LAUNCH,
+  ON_ERROR,
+  ON_THEME_CHANGE,
+  ON_PAGE_NOT_FOUND,
+  ON_UNHANDLE_REJECTION,
+  ON_INIT,
+  ON_LOAD,
+  ON_READY,
+  ON_UNLOAD,
+  ON_RESIZE,
+  ON_BACK_PRESS,
+  ON_PAGE_SCROLL,
+  ON_TAB_ITEM_TAP,
+  ON_REACH_BOTTOM,
+  ON_PULL_DOWN_REFRESH,
+  ON_SHARE_TIMELINE,
+  ON_ADD_TO_FAVORITES,
+  ON_SHARE_APP_MESSAGE,
+  ON_SAVE_EXIT_STATE,
+  ON_NAVIGATION_BAR_BUTTON_TAP,
+  ON_NAVIGATION_BAR_SEARCH_INPUT_CLICKED,
+  ON_NAVIGATION_BAR_SEARCH_INPUT_CHANGED,
+  ON_NAVIGATION_BAR_SEARCH_INPUT_CONFIRMED,
+  ON_NAVIGATION_BAR_SEARCH_INPUT_FOCUS_CHANGED
+];
+const MINI_PROGRAM_PAGE_RUNTIME_HOOKS = /* @__PURE__ */ (() => {
+  return {
+    onPageScroll: 1,
+    onShareAppMessage: 1 << 1,
+    onShareTimeline: 1 << 2
+  };
+})();
 let vueApp;
 const createVueAppHooks = [];
 function onCreateVueApp(hook) {
@@ -115,40 +317,6 @@ function onCreateVueApp(hook) {
 function invokeCreateVueAppHook(app) {
   vueApp = app;
   createVueAppHooks.forEach((hook) => hook(app));
-}
-const eventChannels$1 = {};
-const eventChannelStack$1 = [];
-let id = 0;
-function initEventChannel(events, cache = true) {
-  id++;
-  const eventChannel = new tt.EventChannel(id, events);
-  if (cache) {
-    eventChannels$1[id] = eventChannel;
-    eventChannelStack$1.push(eventChannel);
-  }
-  return eventChannel;
-}
-function getEventChannel$1(id2) {
-  if (id2) {
-    const eventChannel = eventChannels$1[id2];
-    delete eventChannels$1[id2];
-    return eventChannel;
-  }
-  return eventChannelStack$1.shift();
-}
-const navigateTo = {
-  args(fromArgs) {
-    const id2 = initEventChannel(fromArgs.events).id;
-    if (fromArgs.url) {
-      fromArgs.url = fromArgs.url + (fromArgs.url.indexOf("?") === -1 ? "?" : "&") + "__id__=" + id2;
-    }
-  },
-  returnValue(fromRes) {
-    fromRes.eventChannel = getEventChannel$1();
-  }
-};
-function getBaseSystemInfo() {
-  return tt.getSystemInfoSync();
 }
 const E = function() {
 };
@@ -195,6 +363,80 @@ E.prototype = {
   }
 };
 var E$1 = E;
+const LOCALE_ZH_HANS = "zh-Hans";
+const LOCALE_ZH_HANT = "zh-Hant";
+const LOCALE_EN = "en";
+const LOCALE_FR = "fr";
+const LOCALE_ES = "es";
+function include(str, parts) {
+  return !!parts.find((part) => str.indexOf(part) !== -1);
+}
+function startsWith(str, parts) {
+  return parts.find((part) => str.indexOf(part) === 0);
+}
+function normalizeLocale(locale, messages) {
+  if (!locale) {
+    return;
+  }
+  locale = locale.trim().replace(/_/g, "-");
+  if (messages && messages[locale]) {
+    return locale;
+  }
+  locale = locale.toLowerCase();
+  if (locale === "chinese") {
+    return LOCALE_ZH_HANS;
+  }
+  if (locale.indexOf("zh") === 0) {
+    if (locale.indexOf("-hans") > -1) {
+      return LOCALE_ZH_HANS;
+    }
+    if (locale.indexOf("-hant") > -1) {
+      return LOCALE_ZH_HANT;
+    }
+    if (include(locale, ["-tw", "-hk", "-mo", "-cht"])) {
+      return LOCALE_ZH_HANT;
+    }
+    return LOCALE_ZH_HANS;
+  }
+  const lang = startsWith(locale, [LOCALE_EN, LOCALE_FR, LOCALE_ES]);
+  if (lang) {
+    return lang;
+  }
+}
+const eventChannels$1 = {};
+const eventChannelStack$1 = [];
+let id = 0;
+function initEventChannel(events, cache = true) {
+  id++;
+  const eventChannel = new tt.EventChannel(id, events);
+  if (cache) {
+    eventChannels$1[id] = eventChannel;
+    eventChannelStack$1.push(eventChannel);
+  }
+  return eventChannel;
+}
+function getEventChannel$1(id2) {
+  if (id2) {
+    const eventChannel = eventChannels$1[id2];
+    delete eventChannels$1[id2];
+    return eventChannel;
+  }
+  return eventChannelStack$1.shift();
+}
+const navigateTo = {
+  args(fromArgs) {
+    const id2 = initEventChannel(fromArgs.events).id;
+    if (fromArgs.url) {
+      fromArgs.url = fromArgs.url + (fromArgs.url.indexOf("?") === -1 ? "?" : "&") + "__id__=" + id2;
+    }
+  },
+  returnValue(fromRes) {
+    fromRes.eventChannel = getEventChannel$1();
+  }
+};
+function getBaseSystemInfo() {
+  return tt.getSystemInfoSync();
+}
 function validateProtocolFail(name, msg) {
   console.warn(`${name}: ${msg}`);
 }
@@ -659,11 +901,17 @@ function invokePushCallback(args) {
     invokeGetPushCidCallbacks(cid, args.errMsg);
   } else if (args.type === "pushMsg") {
     onPushMessageCallbacks.forEach((callback) => {
-      callback({ type: "receive", data: normalizePushMessage(args.message) });
+      callback({
+        type: "receive",
+        data: normalizePushMessage(args.message)
+      });
     });
   } else if (args.type === "click") {
     onPushMessageCallbacks.forEach((callback) => {
-      callback({ type: "click", data: normalizePushMessage(args.message) });
+      callback({
+        type: "click",
+        data: normalizePushMessage(args.message)
+      });
     });
   }
 }
@@ -674,7 +922,7 @@ function invokeGetPushCidCallbacks(cid2, errMsg) {
   });
   getPushCidCallbacks.length = 0;
 }
-function getPushCid(args) {
+function getPushClientid(args) {
   if (!isPlainObject(args)) {
     args = {};
   }
@@ -685,10 +933,10 @@ function getPushCid(args) {
   getPushCidCallbacks.push((cid2, errMsg) => {
     let res;
     if (cid2) {
-      res = { errMsg: "getPushCid:ok", cid: cid2 };
+      res = { errMsg: "getPushClientid:ok", cid: cid2 };
       hasSuccess && success(res);
     } else {
-      res = { errMsg: "getPushCid:fail" + (errMsg ? " " + errMsg : "") };
+      res = { errMsg: "getPushClientid:fail" + (errMsg ? " " + errMsg : "") };
       hasFail && fail(res);
     }
     hasComplete && complete(res);
@@ -713,7 +961,7 @@ const offPushMessage = (fn) => {
     }
   }
 };
-const SYNC_API_RE = /^\$|getLocale|setLocale|sendNativeEvent|restoreGlobal|requireGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64/;
+const SYNC_API_RE = /^\$|getLocale|setLocale|sendNativeEvent|restoreGlobal|requireGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64|getDeviceInfo|getAppBaseInfo|getWindowInfo/;
 const CONTEXT_API_RE = /^create|Manager$/;
 const CONTEXT_API_RE_EXC = ["createBLEConnection"];
 const ASYNC_API = ["createBLEConnection"];
@@ -842,7 +1090,7 @@ const getLocale = () => {
   if (app && app.$vm) {
     return app.$vm.$locale;
   }
-  return tt.getSystemInfoSync().language || "zh-Hans";
+  return normalizeLocale(tt.getSystemInfoSync().language) || LOCALE_EN;
 };
 const setLocale = (locale) => {
   const app = getApp();
@@ -880,7 +1128,7 @@ const baseApis = {
   getLocale,
   setLocale,
   onLocaleChange,
-  getPushCid,
+  getPushClientid,
   onPushMessage,
   offPushMessage,
   invokePushCallback
@@ -922,6 +1170,127 @@ function initGetProvider(providers) {
     isFunction(complete) && complete(res);
   };
 }
+const UUID_KEY = "__DC_STAT_UUID";
+let deviceId;
+function useDeviceId(global2 = tt) {
+  return function addDeviceId(_, toRes) {
+    deviceId = deviceId || global2.getStorageSync(UUID_KEY);
+    if (!deviceId) {
+      deviceId = Date.now() + "" + Math.floor(Math.random() * 1e7);
+      tt.setStorage({
+        key: UUID_KEY,
+        data: deviceId
+      });
+    }
+    toRes.deviceId = deviceId;
+  };
+}
+function addSafeAreaInsets(fromRes, toRes) {
+  if (fromRes.safeArea) {
+    const safeArea = fromRes.safeArea;
+    toRes.safeAreaInsets = {
+      top: safeArea.top,
+      left: safeArea.left,
+      right: fromRes.windowWidth - safeArea.right,
+      bottom: fromRes.screenHeight - safeArea.bottom
+    };
+  }
+}
+function populateParameters(fromRes, toRes) {
+  const { brand = "", model = "", system = "", language = "", theme, version: version2, platform, fontSizeSetting, SDKVersion, pixelRatio, deviceOrientation } = fromRes;
+  let osName = "";
+  let osVersion = "";
+  {
+    osName = system.split(" ")[0] || "";
+    osVersion = system.split(" ")[1] || "";
+  }
+  let hostVersion = version2;
+  let deviceType = getGetDeviceType(fromRes, model);
+  let deviceBrand = getDeviceBrand(brand);
+  let _hostName = getHostName(fromRes);
+  let _deviceOrientation = deviceOrientation;
+  let _devicePixelRatio = pixelRatio;
+  let _SDKVersion = SDKVersion;
+  const hostLanguage = language.replace(/_/g, "-");
+  const parameters = {
+    appId: "",
+    appName: "\u5E93\u5B58\u7BA1\u7406",
+    appVersion: "1.0.0",
+    appVersionCode: "100",
+    appLanguage: getAppLanguage(hostLanguage),
+    uniCompileVersion: "3.4.15",
+    uniRuntimeVersion: "3.4.15",
+    uniPlatform: "mp-lark",
+    deviceBrand,
+    deviceModel: model,
+    deviceType,
+    devicePixelRatio: _devicePixelRatio,
+    deviceOrientation: _deviceOrientation,
+    osName: osName.toLocaleLowerCase(),
+    osVersion,
+    hostTheme: theme,
+    hostVersion,
+    hostLanguage,
+    hostName: _hostName,
+    hostSDKVersion: _SDKVersion,
+    hostFontSizeSetting: fontSizeSetting,
+    windowTop: 0,
+    windowBottom: 0,
+    osLanguage: void 0,
+    osTheme: void 0,
+    ua: void 0,
+    hostPackageName: void 0,
+    browserName: void 0,
+    browserVersion: void 0
+  };
+  extend(toRes, parameters);
+}
+function getGetDeviceType(fromRes, model) {
+  let deviceType = fromRes.deviceType || "phone";
+  {
+    const deviceTypeMaps = {
+      ipad: "pad",
+      windows: "pc",
+      mac: "pc"
+    };
+    const deviceTypeMapsKeys = Object.keys(deviceTypeMaps);
+    const _model = model.toLocaleLowerCase();
+    for (let index = 0; index < deviceTypeMapsKeys.length; index++) {
+      const _m = deviceTypeMapsKeys[index];
+      if (_model.indexOf(_m) !== -1) {
+        deviceType = deviceTypeMaps[_m];
+        break;
+      }
+    }
+  }
+  return deviceType;
+}
+function getDeviceBrand(brand) {
+  let deviceBrand = brand;
+  if (deviceBrand) {
+    deviceBrand = deviceBrand.toLocaleLowerCase();
+  }
+  return deviceBrand;
+}
+function getAppLanguage(defaultLanguage) {
+  return getLocale ? getLocale() : defaultLanguage;
+}
+function getHostName(fromRes) {
+  const _platform = "mp-lark".split("-")[1];
+  let _hostName = fromRes.hostName || _platform;
+  {
+    _hostName = fromRes.appName;
+  }
+  return _hostName;
+}
+const getSystemInfo = {
+  returnValue: (fromRes, toRes) => {
+    addSafeAreaInsets(fromRes, toRes);
+    useDeviceId()(fromRes, toRes);
+    populateParameters(fromRes, toRes);
+  }
+};
+const getSystemInfoSync = getSystemInfo;
 const redirectTo = {};
 const previewImage = {
   args(fromArgs, toArgs) {
@@ -1052,102 +1421,11 @@ var protocols = /* @__PURE__ */ Object.freeze({
   getFileInfo,
   redirectTo,
   navigateTo,
-  previewImage
+  previewImage,
+  getSystemInfo,
+  getSystemInfoSync
 });
 var uni = initUni(shims, protocols);
-const ON_SHOW$1 = "onShow";
-const ON_HIDE$1 = "onHide";
-const ON_LAUNCH$1 = "onLaunch";
-const ON_ERROR$1 = "onError";
-const ON_THEME_CHANGE$1 = "onThemeChange";
-const ON_PAGE_NOT_FOUND$1 = "onPageNotFound";
-const ON_UNHANDLE_REJECTION$1 = "onUnhandledRejection";
-const ON_LOAD$1 = "onLoad";
-const ON_READY$1 = "onReady";
-const ON_UNLOAD$1 = "onUnload";
-const ON_INIT = "onInit";
-const ON_SAVE_EXIT_STATE = "onSaveExitState";
-const ON_RESIZE$1 = "onResize";
-const ON_BACK_PRESS = "onBackPress";
-const ON_PAGE_SCROLL = "onPageScroll";
-const ON_TAB_ITEM_TAP$1 = "onTabItemTap";
-const ON_REACH_BOTTOM$1 = "onReachBottom";
-const ON_PULL_DOWN_REFRESH$1 = "onPullDownRefresh";
-const ON_SHARE_TIMELINE = "onShareTimeline";
-const ON_ADD_TO_FAVORITES$1 = "onAddToFavorites";
-const ON_SHARE_APP_MESSAGE = "onShareAppMessage";
-const ON_NAVIGATION_BAR_BUTTON_TAP = "onNavigationBarButtonTap";
-const ON_NAVIGATION_BAR_SEARCH_INPUT_CLICKED = "onNavigationBarSearchInputClicked";
-const ON_NAVIGATION_BAR_SEARCH_INPUT_CHANGED = "onNavigationBarSearchInputChanged";
-const ON_NAVIGATION_BAR_SEARCH_INPUT_CONFIRMED = "onNavigationBarSearchInputConfirmed";
-const ON_NAVIGATION_BAR_SEARCH_INPUT_FOCUS_CHANGED = "onNavigationBarSearchInputFocusChanged";
-function getValueByDataPath(obj, path) {
-  if (!isString(path)) {
-    return;
-  }
-  path = path.replace(/\[(\d+)\]/g, ".$1");
-  const parts = path.split(".");
-  let key = parts[0];
-  if (!obj) {
-    obj = {};
-  }
-  if (parts.length === 1) {
-    return obj[key];
-  }
-  return getValueByDataPath(obj[key], parts.slice(1).join("."));
-}
-const PAGE_HOOKS = [
-  ON_INIT,
-  ON_LOAD$1,
-  ON_SHOW$1,
-  ON_HIDE$1,
-  ON_UNLOAD$1,
-  ON_BACK_PRESS,
-  ON_PAGE_SCROLL,
-  ON_TAB_ITEM_TAP$1,
-  ON_REACH_BOTTOM$1,
-  ON_PULL_DOWN_REFRESH$1,
-  ON_SHARE_TIMELINE,
-  ON_SHARE_APP_MESSAGE,
-  ON_ADD_TO_FAVORITES$1,
-  ON_SAVE_EXIT_STATE,
-  ON_NAVIGATION_BAR_BUTTON_TAP,
-  ON_NAVIGATION_BAR_SEARCH_INPUT_CLICKED,
-  ON_NAVIGATION_BAR_SEARCH_INPUT_CHANGED,
-  ON_NAVIGATION_BAR_SEARCH_INPUT_CONFIRMED,
-  ON_NAVIGATION_BAR_SEARCH_INPUT_FOCUS_CHANGED
-];
-function isRootHook(name) {
-  return PAGE_HOOKS.indexOf(name) > -1;
-}
-const UniLifecycleHooks = [
-  ON_SHOW$1,
-  ON_HIDE$1,
-  ON_LAUNCH$1,
-  ON_ERROR$1,
-  ON_THEME_CHANGE$1,
-  ON_PAGE_NOT_FOUND$1,
-  ON_UNHANDLE_REJECTION$1,
-  ON_INIT,
-  ON_LOAD$1,
-  ON_READY$1,
-  ON_UNLOAD$1,
-  ON_RESIZE$1,
-  ON_BACK_PRESS,
-  ON_PAGE_SCROLL,
-  ON_TAB_ITEM_TAP$1,
-  ON_REACH_BOTTOM$1,
-  ON_PULL_DOWN_REFRESH$1,
-  ON_SHARE_TIMELINE,
-  ON_ADD_TO_FAVORITES$1,
-  ON_SHARE_APP_MESSAGE,
-  ON_SAVE_EXIT_STATE,
-  ON_NAVIGATION_BAR_BUTTON_TAP,
-  ON_NAVIGATION_BAR_SEARCH_INPUT_CLICKED,
-  ON_NAVIGATION_BAR_SEARCH_INPUT_CHANGED,
-  ON_NAVIGATION_BAR_SEARCH_INPUT_CONFIRMED,
-  ON_NAVIGATION_BAR_SEARCH_INPUT_FOCUS_CHANGED
-];
 function warn(msg, ...args) {
   console.warn(`[Vue warn] ${msg}`, ...args);
 }
@@ -2755,16 +3033,16 @@ function injectHook(type, hook, target = currentInstance, prepend = false) {
     warn$1(`${apiName} is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup().`);
   }
 }
-const createHook = (lifecycle) => (hook, target = currentInstance) => (!isInSSRComponentSetup || lifecycle === "sp") && injectHook(lifecycle, hook, target);
-const onBeforeMount = createHook("bm");
-const onMounted = createHook("m");
-const onBeforeUpdate = createHook("bu");
-const onUpdated = createHook("u");
-const onBeforeUnmount = createHook("bum");
-const onUnmounted = createHook("um");
-const onServerPrefetch = createHook("sp");
-const onRenderTriggered = createHook("rtg");
-const onRenderTracked = createHook("rtc");
+const createHook$1 = (lifecycle) => (hook, target = currentInstance) => (!isInSSRComponentSetup || lifecycle === "sp") && injectHook(lifecycle, hook, target);
+const onBeforeMount = createHook$1("bm");
+const onMounted = createHook$1("m");
+const onBeforeUpdate = createHook$1("bu");
+const onUpdated = createHook$1("u");
+const onBeforeUnmount = createHook$1("bum");
+const onUnmounted = createHook$1("um");
+const onServerPrefetch = createHook$1("sp");
+const onRenderTriggered = createHook$1("rtg");
+const onRenderTracked = createHook$1("rtc");
 function onErrorCaptured(hook, target = currentInstance) {
   injectHook("ec", hook, target);
 }
@@ -4530,7 +4808,7 @@ function errorHandler(err, instance, info) {
     throw err;
   }
   {
-    app.$vm.$callHook(ON_ERROR$1, err, info);
+    app.$vm.$callHook(ON_ERROR, err, info);
   }
 }
 function mergeAsArray(to, from) {
@@ -4703,7 +4981,7 @@ function createInvoker(initialValue, instance) {
       setTimeout(invoke);
     } else {
       const res = invoke();
-      if (e2.type === "input" && isPromise(res)) {
+      if (e2.type === "input" && (isArray(res) || isPromise(res))) {
         return;
       }
       return res;
@@ -4801,130 +5079,6 @@ function createApp$1(rootComponent, rootProps = null) {
   return createVueApp(rootComponent, rootProps).use(plugin);
 }
 const createSSRApp = createApp$1;
-const SLOT_DEFAULT_NAME = "d";
-const ON_SHOW = "onShow";
-const ON_HIDE = "onHide";
-const ON_LAUNCH = "onLaunch";
-const ON_ERROR = "onError";
-const ON_THEME_CHANGE = "onThemeChange";
-const ON_PAGE_NOT_FOUND = "onPageNotFound";
-const ON_UNHANDLE_REJECTION = "onUnhandledRejection";
-const ON_LOAD = "onLoad";
-const ON_READY = "onReady";
-const ON_UNLOAD = "onUnload";
-const ON_RESIZE = "onResize";
-const ON_TAB_ITEM_TAP = "onTabItemTap";
-const ON_REACH_BOTTOM = "onReachBottom";
-const ON_PULL_DOWN_REFRESH = "onPullDownRefresh";
-const ON_ADD_TO_FAVORITES = "onAddToFavorites";
-const customizeRE = /:/g;
-function customizeEvent(str) {
-  return camelize(str.replace(customizeRE, "-"));
-}
-function hasLeadingSlash(str) {
-  return str.indexOf("/") === 0;
-}
-function addLeadingSlash(str) {
-  return hasLeadingSlash(str) ? str : "/" + str;
-}
-const invokeArrayFns = (fns, arg) => {
-  let ret;
-  for (let i = 0; i < fns.length; i++) {
-    ret = fns[i](arg);
-  }
-  return ret;
-};
-function once(fn, ctx = null) {
-  let res;
-  return (...args) => {
-    if (fn) {
-      res = fn.apply(ctx, args);
-      fn = null;
-    }
-    return res;
-  };
-}
-const encode = encodeURIComponent;
-function stringifyQuery(obj, encodeStr = encode) {
-  const res = obj ? Object.keys(obj).map((key) => {
-    let val = obj[key];
-    if (typeof val === void 0 || val === null) {
-      val = "";
-    } else if (isPlainObject(val)) {
-      val = JSON.stringify(val);
-    }
-    return encodeStr(key) + "=" + encodeStr(val);
-  }).filter((x) => x.length > 0).join("&") : null;
-  return res ? `?${res}` : "";
-}
-class EventChannel {
-  constructor(id2, events) {
-    this.id = id2;
-    this.listener = {};
-    this.emitCache = {};
-    if (events) {
-      Object.keys(events).forEach((name) => {
-        this.on(name, events[name]);
-      });
-    }
-  }
-  emit(eventName, ...args) {
-    const fns = this.listener[eventName];
-    if (!fns) {
-      return (this.emitCache[eventName] || (this.emitCache[eventName] = [])).push(args);
-    }
-    fns.forEach((opt) => {
-      opt.fn.apply(opt.fn, args);
-    });
-    this.listener[eventName] = fns.filter((opt) => opt.type !== "once");
-  }
-  on(eventName, fn) {
-    this._addListener(eventName, "on", fn);
-    this._clearCache(eventName);
-  }
-  once(eventName, fn) {
-    this._addListener(eventName, "once", fn);
-    this._clearCache(eventName);
-  }
-  off(eventName, fn) {
-    const fns = this.listener[eventName];
-    if (!fns) {
-      return;
-    }
-    if (fn) {
-      for (let i = 0; i < fns.length; ) {
-        if (fns[i].fn === fn) {
-          fns.splice(i, 1);
-          i--;
-        }
-        i++;
-      }
-    } else {
-      delete this.listener[eventName];
-    }
-  }
-  _clearCache(eventName) {
-    const cacheArgs = this.emitCache[eventName];
-    if (cacheArgs) {
-      for (; cacheArgs.length > 0; ) {
-        this.emit.apply(this, [eventName, ...cacheArgs.shift()]);
-      }
-    }
-  }
-  _addListener(eventName, type, fn) {
-    (this.listener[eventName] || (this.listener[eventName] = [])).push({
-      fn,
-      type
-    });
-  }
-}
-const MINI_PROGRAM_PAGE_RUNTIME_HOOKS = /* @__PURE__ */ (() => {
-  return {
-    onPageScroll: 1,
-    onShareAppMessage: 1 << 1,
-    onShareTimeline: 1 << 2
-  };
-})();
 const eventChannels = {};
 const eventChannelStack = [];
 function getEventChannel(id2) {
@@ -5051,7 +5205,7 @@ function findHooks(vueOptions, hooks = /* @__PURE__ */ new Set()) {
   }
   return hooks;
 }
-function initHook$1(mpOptions, hook, excludes) {
+function initHook(mpOptions, hook, excludes) {
   if (excludes.indexOf(hook) === -1 && !hasOwn(mpOptions, hook)) {
     mpOptions[hook] = function(args) {
       if (hook === "onError") {
@@ -5063,10 +5217,10 @@ function initHook$1(mpOptions, hook, excludes) {
 }
 const EXCLUDE_HOOKS = [ON_READY];
 function initHooks(mpOptions, hooks, excludes = EXCLUDE_HOOKS) {
-  hooks.forEach((hook) => initHook$1(mpOptions, hook, excludes));
+  hooks.forEach((hook) => initHook(mpOptions, hook, excludes));
 }
 function initUnknownHooks(mpOptions, vueOptions, excludes = EXCLUDE_HOOKS) {
-  findHooks(vueOptions).forEach((hook) => initHook$1(mpOptions, hook, excludes));
+  findHooks(vueOptions).forEach((hook) => initHook(mpOptions, hook, excludes));
 }
 function initRuntimeHooks(mpOptions, runtimeHooks) {
   if (!runtimeHooks) {
@@ -5075,7 +5229,7 @@ function initRuntimeHooks(mpOptions, runtimeHooks) {
   const hooks = Object.keys(MINI_PROGRAM_PAGE_RUNTIME_HOOKS);
   hooks.forEach((hook) => {
     if (runtimeHooks & MINI_PROGRAM_PAGE_RUNTIME_HOOKS[hook]) {
-      initHook$1(mpOptions, hook, []);
+      initHook(mpOptions, hook, []);
     }
   });
 }
@@ -5186,7 +5340,7 @@ function initAppLifecycle(appOptions, vm) {
   }
 }
 function initLocale(appVm) {
-  const locale = ref(tt.getSystemInfoSync().language || "zh-Hans");
+  const locale = ref(normalizeLocale(tt.getSystemInfoSync().language) || LOCALE_EN);
   Object.defineProperty(appVm, "$locale", {
     get() {
       return locale.value;
@@ -5561,7 +5715,7 @@ function initTriggerEvent(mpInstance) {
     return oldTriggerEvent.apply(mpInstance, [customizeEvent(event), ...args]);
   };
 }
-function initHook(name, options, isComponent) {
+function initMiniProgramHook(name, options, isComponent) {
   if (isComponent) {
     options = options.lifetimes;
   }
@@ -5578,11 +5732,11 @@ function initHook(name, options, isComponent) {
   }
 }
 Page = function(options) {
-  initHook(ON_LOAD, options);
+  initMiniProgramHook(ON_LOAD, options);
   return MPPage(options);
 };
 Component = function(options) {
-  initHook("created", options, true);
+  initMiniProgramHook("created", options, true);
   const isVueComponent = options.properties && options.properties.uP;
   if (!isVueComponent) {
     initProps(options);
@@ -5798,213 +5952,14 @@ tt.createApp = global.createApp = createApp;
 tt.createPage = createPage;
 tt.createComponent = createComponent;
 tt.createSubpackageApp = global.createSubpackageApp = createSubpackageApp;
+const createHook = (lifecycle) => (hook, target = getCurrentInstance()) => {
+  !isInSSRComponentSetup && injectHook(lifecycle, hook, target);
+};
+const onShow = /* @__PURE__ */ createHook(ON_SHOW);
+const onHide = /* @__PURE__ */ createHook(ON_HIDE);
+const onLaunch = /* @__PURE__ */ createHook(ON_LAUNCH);
+const onPullDownRefresh = /* @__PURE__ */ createHook(ON_PULL_DOWN_REFRESH);
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
-var dayjs_min = { exports: {} };
-(function(module, exports2) {
-  !function(t2, e2) {
-    module.exports = e2();
-  }(commonjsGlobal, function() {
-    var t2 = 1e3, e2 = 6e4, n = 36e5, r = "millisecond", i = "second", s = "minute", u = "hour", a = "day", o2 = "week", f2 = "month", h = "quarter", c = "year", d = "date", $ = "Invalid Date", l = /^(\d{4})[-/]?(\d{1,2})?[-/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$/, y = /\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g, M = { name: "en", weekdays: "Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"), months: "January_February_March_April_May_June_July_August_September_October_November_December".split("_") }, m = function(t3, e3, n2) {
-      var r2 = String(t3);
-      return !r2 || r2.length >= e3 ? t3 : "" + Array(e3 + 1 - r2.length).join(n2) + t3;
-    }, g = { s: m, z: function(t3) {
-      var e3 = -t3.utcOffset(), n2 = Math.abs(e3), r2 = Math.floor(n2 / 60), i2 = n2 % 60;
-      return (e3 <= 0 ? "+" : "-") + m(r2, 2, "0") + ":" + m(i2, 2, "0");
-    }, m: function t3(e3, n2) {
-      if (e3.date() < n2.date())
-        return -t3(n2, e3);
-      var r2 = 12 * (n2.year() - e3.year()) + (n2.month() - e3.month()), i2 = e3.clone().add(r2, f2), s2 = n2 - i2 < 0, u2 = e3.clone().add(r2 + (s2 ? -1 : 1), f2);
-      return +(-(r2 + (n2 - i2) / (s2 ? i2 - u2 : u2 - i2)) || 0);
-    }, a: function(t3) {
-      return t3 < 0 ? Math.ceil(t3) || 0 : Math.floor(t3);
-    }, p: function(t3) {
-      return { M: f2, y: c, w: o2, d: a, D: d, h: u, m: s, s: i, ms: r, Q: h }[t3] || String(t3 || "").toLowerCase().replace(/s$/, "");
-    }, u: function(t3) {
-      return t3 === void 0;
-    } }, v = "en", D = {};
-    D[v] = M;
-    var p2 = function(t3) {
-      return t3 instanceof _;
-    }, S = function t3(e3, n2, r2) {
-      var i2;
-      if (!e3)
-        return v;
-      if (typeof e3 == "string") {
-        var s2 = e3.toLowerCase();
-        D[s2] && (i2 = s2), n2 && (D[s2] = n2, i2 = s2);
-        var u2 = e3.split("-");
-        if (!i2 && u2.length > 1)
-          return t3(u2[0]);
-      } else {
-        var a2 = e3.name;
-        D[a2] = e3, i2 = a2;
-      }
-      return !r2 && i2 && (v = i2), i2 || !r2 && v;
-    }, w = function(t3, e3) {
-      if (p2(t3))
-        return t3.clone();
-      var n2 = typeof e3 == "object" ? e3 : {};
-      return n2.date = t3, n2.args = arguments, new _(n2);
-    }, O = g;
-    O.l = S, O.i = p2, O.w = function(t3, e3) {
-      return w(t3, { locale: e3.$L, utc: e3.$u, x: e3.$x, $offset: e3.$offset });
-    };
-    var _ = function() {
-      function M2(t3) {
-        this.$L = S(t3.locale, null, true), this.parse(t3);
-      }
-      var m2 = M2.prototype;
-      return m2.parse = function(t3) {
-        this.$d = function(t4) {
-          var e3 = t4.date, n2 = t4.utc;
-          if (e3 === null)
-            return new Date(NaN);
-          if (O.u(e3))
-            return new Date();
-          if (e3 instanceof Date)
-            return new Date(e3);
-          if (typeof e3 == "string" && !/Z$/i.test(e3)) {
-            var r2 = e3.match(l);
-            if (r2) {
-              var i2 = r2[2] - 1 || 0, s2 = (r2[7] || "0").substring(0, 3);
-              return n2 ? new Date(Date.UTC(r2[1], i2, r2[3] || 1, r2[4] || 0, r2[5] || 0, r2[6] || 0, s2)) : new Date(r2[1], i2, r2[3] || 1, r2[4] || 0, r2[5] || 0, r2[6] || 0, s2);
-            }
-          }
-          return new Date(e3);
-        }(t3), this.$x = t3.x || {}, this.init();
-      }, m2.init = function() {
-        var t3 = this.$d;
-        this.$y = t3.getFullYear(), this.$M = t3.getMonth(), this.$D = t3.getDate(), this.$W = t3.getDay(), this.$H = t3.getHours(), this.$m = t3.getMinutes(), this.$s = t3.getSeconds(), this.$ms = t3.getMilliseconds();
-      }, m2.$utils = function() {
-        return O;
-      }, m2.isValid = function() {
-        return !(this.$d.toString() === $);
-      }, m2.isSame = function(t3, e3) {
-        var n2 = w(t3);
-        return this.startOf(e3) <= n2 && n2 <= this.endOf(e3);
-      }, m2.isAfter = function(t3, e3) {
-        return w(t3) < this.startOf(e3);
-      }, m2.isBefore = function(t3, e3) {
-        return this.endOf(e3) < w(t3);
-      }, m2.$g = function(t3, e3, n2) {
-        return O.u(t3) ? this[e3] : this.set(n2, t3);
-      }, m2.unix = function() {
-        return Math.floor(this.valueOf() / 1e3);
-      }, m2.valueOf = function() {
-        return this.$d.getTime();
-      }, m2.startOf = function(t3, e3) {
-        var n2 = this, r2 = !!O.u(e3) || e3, h2 = O.p(t3), $2 = function(t4, e4) {
-          var i2 = O.w(n2.$u ? Date.UTC(n2.$y, e4, t4) : new Date(n2.$y, e4, t4), n2);
-          return r2 ? i2 : i2.endOf(a);
-        }, l2 = function(t4, e4) {
-          return O.w(n2.toDate()[t4].apply(n2.toDate("s"), (r2 ? [0, 0, 0, 0] : [23, 59, 59, 999]).slice(e4)), n2);
-        }, y2 = this.$W, M3 = this.$M, m3 = this.$D, g2 = "set" + (this.$u ? "UTC" : "");
-        switch (h2) {
-          case c:
-            return r2 ? $2(1, 0) : $2(31, 11);
-          case f2:
-            return r2 ? $2(1, M3) : $2(0, M3 + 1);
-          case o2:
-            var v2 = this.$locale().weekStart || 0, D2 = (y2 < v2 ? y2 + 7 : y2) - v2;
-            return $2(r2 ? m3 - D2 : m3 + (6 - D2), M3);
-          case a:
-          case d:
-            return l2(g2 + "Hours", 0);
-          case u:
-            return l2(g2 + "Minutes", 1);
-          case s:
-            return l2(g2 + "Seconds", 2);
-          case i:
-            return l2(g2 + "Milliseconds", 3);
-          default:
-            return this.clone();
-        }
-      }, m2.endOf = function(t3) {
-        return this.startOf(t3, false);
-      }, m2.$set = function(t3, e3) {
-        var n2, o3 = O.p(t3), h2 = "set" + (this.$u ? "UTC" : ""), $2 = (n2 = {}, n2[a] = h2 + "Date", n2[d] = h2 + "Date", n2[f2] = h2 + "Month", n2[c] = h2 + "FullYear", n2[u] = h2 + "Hours", n2[s] = h2 + "Minutes", n2[i] = h2 + "Seconds", n2[r] = h2 + "Milliseconds", n2)[o3], l2 = o3 === a ? this.$D + (e3 - this.$W) : e3;
-        if (o3 === f2 || o3 === c) {
-          var y2 = this.clone().set(d, 1);
-          y2.$d[$2](l2), y2.init(), this.$d = y2.set(d, Math.min(this.$D, y2.daysInMonth())).$d;
-        } else
-          $2 && this.$d[$2](l2);
-        return this.init(), this;
-      }, m2.set = function(t3, e3) {
-        return this.clone().$set(t3, e3);
-      }, m2.get = function(t3) {
-        return this[O.p(t3)]();
-      }, m2.add = function(r2, h2) {
-        var d2, $2 = this;
-        r2 = Number(r2);
-        var l2 = O.p(h2), y2 = function(t3) {
-          var e3 = w($2);
-          return O.w(e3.date(e3.date() + Math.round(t3 * r2)), $2);
-        };
-        if (l2 === f2)
-          return this.set(f2, this.$M + r2);
-        if (l2 === c)
-          return this.set(c, this.$y + r2);
-        if (l2 === a)
-          return y2(1);
-        if (l2 === o2)
-          return y2(7);
-        var M3 = (d2 = {}, d2[s] = e2, d2[u] = n, d2[i] = t2, d2)[l2] || 1, m3 = this.$d.getTime() + r2 * M3;
-        return O.w(m3, this);
-      }, m2.subtract = function(t3, e3) {
-        return this.add(-1 * t3, e3);
-      }, m2.format = function(t3) {
-        var e3 = this, n2 = this.$locale();
-        if (!this.isValid())
-          return n2.invalidDate || $;
-        var r2 = t3 || "YYYY-MM-DDTHH:mm:ssZ", i2 = O.z(this), s2 = this.$H, u2 = this.$m, a2 = this.$M, o3 = n2.weekdays, f3 = n2.months, h2 = function(t4, n3, i3, s3) {
-          return t4 && (t4[n3] || t4(e3, r2)) || i3[n3].slice(0, s3);
-        }, c2 = function(t4) {
-          return O.s(s2 % 12 || 12, t4, "0");
-        }, d2 = n2.meridiem || function(t4, e4, n3) {
-          var r3 = t4 < 12 ? "AM" : "PM";
-          return n3 ? r3.toLowerCase() : r3;
-        }, l2 = { YY: String(this.$y).slice(-2), YYYY: this.$y, M: a2 + 1, MM: O.s(a2 + 1, 2, "0"), MMM: h2(n2.monthsShort, a2, f3, 3), MMMM: h2(f3, a2), D: this.$D, DD: O.s(this.$D, 2, "0"), d: String(this.$W), dd: h2(n2.weekdaysMin, this.$W, o3, 2), ddd: h2(n2.weekdaysShort, this.$W, o3, 3), dddd: o3[this.$W], H: String(s2), HH: O.s(s2, 2, "0"), h: c2(1), hh: c2(2), a: d2(s2, u2, true), A: d2(s2, u2, false), m: String(u2), mm: O.s(u2, 2, "0"), s: String(this.$s), ss: O.s(this.$s, 2, "0"), SSS: O.s(this.$ms, 3, "0"), Z: i2 };
-        return r2.replace(y, function(t4, e4) {
-          return e4 || l2[t4] || i2.replace(":", "");
-        });
-      }, m2.utcOffset = function() {
-        return 15 * -Math.round(this.$d.getTimezoneOffset() / 15);
-      }, m2.diff = function(r2, d2, $2) {
-        var l2, y2 = O.p(d2), M3 = w(r2), m3 = (M3.utcOffset() - this.utcOffset()) * e2, g2 = this - M3, v2 = O.m(this, M3);
-        return v2 = (l2 = {}, l2[c] = v2 / 12, l2[f2] = v2, l2[h] = v2 / 3, l2[o2] = (g2 - m3) / 6048e5, l2[a] = (g2 - m3) / 864e5, l2[u] = g2 / n, l2[s] = g2 / e2, l2[i] = g2 / t2, l2)[y2] || g2, $2 ? v2 : O.a(v2);
-      }, m2.daysInMonth = function() {
-        return this.endOf(f2).$D;
-      }, m2.$locale = function() {
-        return D[this.$L];
-      }, m2.locale = function(t3, e3) {
-        if (!t3)
-          return this.$L;
-        var n2 = this.clone(), r2 = S(t3, e3, true);
-        return r2 && (n2.$L = r2), n2;
-      }, m2.clone = function() {
-        return O.w(this.$d, this);
-      }, m2.toDate = function() {
-        return new Date(this.valueOf());
-      }, m2.toJSON = function() {
-        return this.isValid() ? this.toISOString() : null;
-      }, m2.toISOString = function() {
-        return this.$d.toISOString();
-      }, m2.toString = function() {
-        return this.$d.toUTCString();
-      }, M2;
-    }(), T = _.prototype;
-    return w.prototype = T, [["$ms", r], ["$s", i], ["$m", s], ["$H", u], ["$W", a], ["$M", f2], ["$y", c], ["$D", d]].forEach(function(t3) {
-      T[t3[1]] = function(e3) {
-        return this.$g(e3, t3[0], t3[1]);
-      };
-    }), w.extend = function(t3, e3) {
-      return t3.$i || (t3(e3, _, w), t3.$i = true), w;
-    }, w.locale = S, w.isDayjs = p2, w.unix = function(t3) {
-      return w(1e3 * t3);
-    }, w.en = D[v], w.Ls = D, w.p = {}, w;
-  });
-})(dayjs_min);
-var dayjs = dayjs_min.exports;
 var lodash = { exports: {} };
 /**
  * @license
@@ -10579,7 +10534,7 @@ var lodash = { exports: {} };
       var startCase = createCompounder(function(result2, word, index) {
         return result2 + (index ? " " : "") + upperFirst(word);
       });
-      function startsWith(string, target, position) {
+      function startsWith2(string, target, position) {
         string = toString(string);
         position = position == null ? 0 : baseClamp(toInteger(position), 0, string.length);
         target = baseToString(target);
@@ -11213,7 +11168,7 @@ var lodash = { exports: {} };
       lodash2.sortedLastIndexBy = sortedLastIndexBy;
       lodash2.sortedLastIndexOf = sortedLastIndexOf;
       lodash2.startCase = startCase;
-      lodash2.startsWith = startsWith;
+      lodash2.startsWith = startsWith2;
       lodash2.subtract = subtract;
       lodash2.sum = sum;
       lodash2.sumBy = sumBy;
@@ -11416,6 +11371,212 @@ var lodash = { exports: {} };
     }
   }).call(commonjsGlobal);
 })(lodash, lodash.exports);
+var dayjs_min = { exports: {} };
+(function(module, exports2) {
+  !function(t2, e2) {
+    module.exports = e2();
+  }(commonjsGlobal, function() {
+    var t2 = 1e3, e2 = 6e4, n = 36e5, r = "millisecond", i = "second", s = "minute", u = "hour", a = "day", o2 = "week", f2 = "month", h = "quarter", c = "year", d = "date", $ = "Invalid Date", l = /^(\d{4})[-/]?(\d{1,2})?[-/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$/, y = /\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g, M = { name: "en", weekdays: "Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"), months: "January_February_March_April_May_June_July_August_September_October_November_December".split("_") }, m = function(t3, e3, n2) {
+      var r2 = String(t3);
+      return !r2 || r2.length >= e3 ? t3 : "" + Array(e3 + 1 - r2.length).join(n2) + t3;
+    }, g = { s: m, z: function(t3) {
+      var e3 = -t3.utcOffset(), n2 = Math.abs(e3), r2 = Math.floor(n2 / 60), i2 = n2 % 60;
+      return (e3 <= 0 ? "+" : "-") + m(r2, 2, "0") + ":" + m(i2, 2, "0");
+    }, m: function t3(e3, n2) {
+      if (e3.date() < n2.date())
+        return -t3(n2, e3);
+      var r2 = 12 * (n2.year() - e3.year()) + (n2.month() - e3.month()), i2 = e3.clone().add(r2, f2), s2 = n2 - i2 < 0, u2 = e3.clone().add(r2 + (s2 ? -1 : 1), f2);
+      return +(-(r2 + (n2 - i2) / (s2 ? i2 - u2 : u2 - i2)) || 0);
+    }, a: function(t3) {
+      return t3 < 0 ? Math.ceil(t3) || 0 : Math.floor(t3);
+    }, p: function(t3) {
+      return { M: f2, y: c, w: o2, d: a, D: d, h: u, m: s, s: i, ms: r, Q: h }[t3] || String(t3 || "").toLowerCase().replace(/s$/, "");
+    }, u: function(t3) {
+      return t3 === void 0;
+    } }, v = "en", D = {};
+    D[v] = M;
+    var p2 = function(t3) {
+      return t3 instanceof _;
+    }, S = function t3(e3, n2, r2) {
+      var i2;
+      if (!e3)
+        return v;
+      if (typeof e3 == "string") {
+        var s2 = e3.toLowerCase();
+        D[s2] && (i2 = s2), n2 && (D[s2] = n2, i2 = s2);
+        var u2 = e3.split("-");
+        if (!i2 && u2.length > 1)
+          return t3(u2[0]);
+      } else {
+        var a2 = e3.name;
+        D[a2] = e3, i2 = a2;
+      }
+      return !r2 && i2 && (v = i2), i2 || !r2 && v;
+    }, w = function(t3, e3) {
+      if (p2(t3))
+        return t3.clone();
+      var n2 = typeof e3 == "object" ? e3 : {};
+      return n2.date = t3, n2.args = arguments, new _(n2);
+    }, O = g;
+    O.l = S, O.i = p2, O.w = function(t3, e3) {
+      return w(t3, { locale: e3.$L, utc: e3.$u, x: e3.$x, $offset: e3.$offset });
+    };
+    var _ = function() {
+      function M2(t3) {
+        this.$L = S(t3.locale, null, true), this.parse(t3);
+      }
+      var m2 = M2.prototype;
+      return m2.parse = function(t3) {
+        this.$d = function(t4) {
+          var e3 = t4.date, n2 = t4.utc;
+          if (e3 === null)
+            return new Date(NaN);
+          if (O.u(e3))
+            return new Date();
+          if (e3 instanceof Date)
+            return new Date(e3);
+          if (typeof e3 == "string" && !/Z$/i.test(e3)) {
+            var r2 = e3.match(l);
+            if (r2) {
+              var i2 = r2[2] - 1 || 0, s2 = (r2[7] || "0").substring(0, 3);
+              return n2 ? new Date(Date.UTC(r2[1], i2, r2[3] || 1, r2[4] || 0, r2[5] || 0, r2[6] || 0, s2)) : new Date(r2[1], i2, r2[3] || 1, r2[4] || 0, r2[5] || 0, r2[6] || 0, s2);
+            }
+          }
+          return new Date(e3);
+        }(t3), this.$x = t3.x || {}, this.init();
+      }, m2.init = function() {
+        var t3 = this.$d;
+        this.$y = t3.getFullYear(), this.$M = t3.getMonth(), this.$D = t3.getDate(), this.$W = t3.getDay(), this.$H = t3.getHours(), this.$m = t3.getMinutes(), this.$s = t3.getSeconds(), this.$ms = t3.getMilliseconds();
+      }, m2.$utils = function() {
+        return O;
+      }, m2.isValid = function() {
+        return !(this.$d.toString() === $);
+      }, m2.isSame = function(t3, e3) {
+        var n2 = w(t3);
+        return this.startOf(e3) <= n2 && n2 <= this.endOf(e3);
+      }, m2.isAfter = function(t3, e3) {
+        return w(t3) < this.startOf(e3);
+      }, m2.isBefore = function(t3, e3) {
+        return this.endOf(e3) < w(t3);
+      }, m2.$g = function(t3, e3, n2) {
+        return O.u(t3) ? this[e3] : this.set(n2, t3);
+      }, m2.unix = function() {
+        return Math.floor(this.valueOf() / 1e3);
+      }, m2.valueOf = function() {
+        return this.$d.getTime();
+      }, m2.startOf = function(t3, e3) {
+        var n2 = this, r2 = !!O.u(e3) || e3, h2 = O.p(t3), $2 = function(t4, e4) {
+          var i2 = O.w(n2.$u ? Date.UTC(n2.$y, e4, t4) : new Date(n2.$y, e4, t4), n2);
+          return r2 ? i2 : i2.endOf(a);
+        }, l2 = function(t4, e4) {
+          return O.w(n2.toDate()[t4].apply(n2.toDate("s"), (r2 ? [0, 0, 0, 0] : [23, 59, 59, 999]).slice(e4)), n2);
+        }, y2 = this.$W, M3 = this.$M, m3 = this.$D, g2 = "set" + (this.$u ? "UTC" : "");
+        switch (h2) {
+          case c:
+            return r2 ? $2(1, 0) : $2(31, 11);
+          case f2:
+            return r2 ? $2(1, M3) : $2(0, M3 + 1);
+          case o2:
+            var v2 = this.$locale().weekStart || 0, D2 = (y2 < v2 ? y2 + 7 : y2) - v2;
+            return $2(r2 ? m3 - D2 : m3 + (6 - D2), M3);
+          case a:
+          case d:
+            return l2(g2 + "Hours", 0);
+          case u:
+            return l2(g2 + "Minutes", 1);
+          case s:
+            return l2(g2 + "Seconds", 2);
+          case i:
+            return l2(g2 + "Milliseconds", 3);
+          default:
+            return this.clone();
+        }
+      }, m2.endOf = function(t3) {
+        return this.startOf(t3, false);
+      }, m2.$set = function(t3, e3) {
+        var n2, o3 = O.p(t3), h2 = "set" + (this.$u ? "UTC" : ""), $2 = (n2 = {}, n2[a] = h2 + "Date", n2[d] = h2 + "Date", n2[f2] = h2 + "Month", n2[c] = h2 + "FullYear", n2[u] = h2 + "Hours", n2[s] = h2 + "Minutes", n2[i] = h2 + "Seconds", n2[r] = h2 + "Milliseconds", n2)[o3], l2 = o3 === a ? this.$D + (e3 - this.$W) : e3;
+        if (o3 === f2 || o3 === c) {
+          var y2 = this.clone().set(d, 1);
+          y2.$d[$2](l2), y2.init(), this.$d = y2.set(d, Math.min(this.$D, y2.daysInMonth())).$d;
+        } else
+          $2 && this.$d[$2](l2);
+        return this.init(), this;
+      }, m2.set = function(t3, e3) {
+        return this.clone().$set(t3, e3);
+      }, m2.get = function(t3) {
+        return this[O.p(t3)]();
+      }, m2.add = function(r2, h2) {
+        var d2, $2 = this;
+        r2 = Number(r2);
+        var l2 = O.p(h2), y2 = function(t3) {
+          var e3 = w($2);
+          return O.w(e3.date(e3.date() + Math.round(t3 * r2)), $2);
+        };
+        if (l2 === f2)
+          return this.set(f2, this.$M + r2);
+        if (l2 === c)
+          return this.set(c, this.$y + r2);
+        if (l2 === a)
+          return y2(1);
+        if (l2 === o2)
+          return y2(7);
+        var M3 = (d2 = {}, d2[s] = e2, d2[u] = n, d2[i] = t2, d2)[l2] || 1, m3 = this.$d.getTime() + r2 * M3;
+        return O.w(m3, this);
+      }, m2.subtract = function(t3, e3) {
+        return this.add(-1 * t3, e3);
+      }, m2.format = function(t3) {
+        var e3 = this, n2 = this.$locale();
+        if (!this.isValid())
+          return n2.invalidDate || $;
+        var r2 = t3 || "YYYY-MM-DDTHH:mm:ssZ", i2 = O.z(this), s2 = this.$H, u2 = this.$m, a2 = this.$M, o3 = n2.weekdays, f3 = n2.months, h2 = function(t4, n3, i3, s3) {
+          return t4 && (t4[n3] || t4(e3, r2)) || i3[n3].slice(0, s3);
+        }, c2 = function(t4) {
+          return O.s(s2 % 12 || 12, t4, "0");
+        }, d2 = n2.meridiem || function(t4, e4, n3) {
+          var r3 = t4 < 12 ? "AM" : "PM";
+          return n3 ? r3.toLowerCase() : r3;
+        }, l2 = { YY: String(this.$y).slice(-2), YYYY: this.$y, M: a2 + 1, MM: O.s(a2 + 1, 2, "0"), MMM: h2(n2.monthsShort, a2, f3, 3), MMMM: h2(f3, a2), D: this.$D, DD: O.s(this.$D, 2, "0"), d: String(this.$W), dd: h2(n2.weekdaysMin, this.$W, o3, 2), ddd: h2(n2.weekdaysShort, this.$W, o3, 3), dddd: o3[this.$W], H: String(s2), HH: O.s(s2, 2, "0"), h: c2(1), hh: c2(2), a: d2(s2, u2, true), A: d2(s2, u2, false), m: String(u2), mm: O.s(u2, 2, "0"), s: String(this.$s), ss: O.s(this.$s, 2, "0"), SSS: O.s(this.$ms, 3, "0"), Z: i2 };
+        return r2.replace(y, function(t4, e4) {
+          return e4 || l2[t4] || i2.replace(":", "");
+        });
+      }, m2.utcOffset = function() {
+        return 15 * -Math.round(this.$d.getTimezoneOffset() / 15);
+      }, m2.diff = function(r2, d2, $2) {
+        var l2, y2 = O.p(d2), M3 = w(r2), m3 = (M3.utcOffset() - this.utcOffset()) * e2, g2 = this - M3, v2 = O.m(this, M3);
+        return v2 = (l2 = {}, l2[c] = v2 / 12, l2[f2] = v2, l2[h] = v2 / 3, l2[o2] = (g2 - m3) / 6048e5, l2[a] = (g2 - m3) / 864e5, l2[u] = g2 / n, l2[s] = g2 / e2, l2[i] = g2 / t2, l2)[y2] || g2, $2 ? v2 : O.a(v2);
+      }, m2.daysInMonth = function() {
+        return this.endOf(f2).$D;
+      }, m2.$locale = function() {
+        return D[this.$L];
+      }, m2.locale = function(t3, e3) {
+        if (!t3)
+          return this.$L;
+        var n2 = this.clone(), r2 = S(t3, e3, true);
+        return r2 && (n2.$L = r2), n2;
+      }, m2.clone = function() {
+        return O.w(this.$d, this);
+      }, m2.toDate = function() {
+        return new Date(this.valueOf());
+      }, m2.toJSON = function() {
+        return this.isValid() ? this.toISOString() : null;
+      }, m2.toISOString = function() {
+        return this.$d.toISOString();
+      }, m2.toString = function() {
+        return this.$d.toUTCString();
+      }, M2;
+    }(), T = _.prototype;
+    return w.prototype = T, [["$ms", r], ["$s", i], ["$m", s], ["$H", u], ["$W", a], ["$M", f2], ["$y", c], ["$D", d]].forEach(function(t3) {
+      T[t3[1]] = function(e3) {
+        return this.$g(e3, t3[0], t3[1]);
+      };
+    }), w.extend = function(t3, e3) {
+      return t3.$i || (t3(e3, _, w), t3.$i = true), w;
+    }, w.locale = S, w.isDayjs = p2, w.unix = function(t3) {
+      return w(1e3 * t3);
+    }, w.en = D[v], w.Ls = D, w.p = {}, w;
+  });
+})(dayjs_min);
+var dayjs = dayjs_min.exports;
 exports._export_sfc = _export_sfc;
 exports.computed$1 = computed$1;
 exports.createSSRApp = createSSRApp;
@@ -11425,7 +11586,11 @@ exports.e = e;
 exports.f = f;
 exports.lodash = lodash;
 exports.o = o;
+exports.onHide = onHide;
+exports.onLaunch = onLaunch;
 exports.onMounted = onMounted;
+exports.onPullDownRefresh = onPullDownRefresh;
+exports.onShow = onShow;
 exports.p = p;
 exports.ref = ref;
 exports.sr = sr;

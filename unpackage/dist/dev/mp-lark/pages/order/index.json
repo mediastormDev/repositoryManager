@@ -1,7 +1,10 @@
 {
   "navigationBarTitleText": "工单",
+  "enablePullDownRefresh": true,
   "usingComponents": {
     "my-orders-view": "../../components/MyOrders/MyOrders",
-    "my-returns-view": "../../components/MyReturns/MyReturns"
+    "my-returns-view": "../../components/MyReturns/MyReturns",
+    "admin-returns-view": "../../components/AdminReturn/AdminReturn",
+    "admin-borrow-view": "../../components/AdminBorrow/AdminBorrow"
   }
 }

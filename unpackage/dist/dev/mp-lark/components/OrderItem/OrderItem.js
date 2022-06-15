@@ -9,16 +9,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref();
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.t(__props.info.nickname || ""),
-        b: __props.info.lentAt
+        a: __props.info
+      }, __props.info ? common_vendor.e({
+        b: common_vendor.t(__props.info.nickname || ""),
+        c: __props.info.lentAt
       }, __props.info.lentAt ? {
-        c: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.lentAt).format("MM-DD HH:mm"))
+        d: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.lentAt).format("MM-DD HH:mm"))
       } : {
-        d: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.pendingLentAt).format("MM-DD HH:mm")),
-        e: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.pendingReturnAt).format("MM-DD HH:mm"))
+        e: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.pendingLentAt).format("MM-DD HH:mm")),
+        f: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.pendingReturnAt).format("MM-DD HH:mm"))
       }, {
-        f: __props.bgColor
-      });
+        g: __props.bgColor
+      }) : {});
     };
   }
 });

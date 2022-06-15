@@ -1,13 +1,44 @@
 "use strict";
 var common_vendor = require("../../common/vendor.js");
+var common_apis_borrow = require("../../common/apis/borrow.js");
+var composables_UseToken = require("../../composables/UseToken.js");
+require("../../common/http/index.js");
 if (!Math) {
   MyReturnItemView();
 }
 const MyReturnItemView = () => "../MyReturnItem/MyReturnItem.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
-  setup(__props) {
+  setup(__props, { expose }) {
+    const {
+      openId
+    } = composables_UseToken.UseToken();
+    const borrowList = common_vendor.ref([]);
+    const loadData = () => {
+      console.log("openId", openId.value);
+      common_apis_borrow.borrowListByType("INUSE", openId.value).then((res) => {
+        borrowList.value = res;
+        console.log("borrowList", borrowList.value);
+        common_vendor.uni.stopPullDownRefresh();
+      });
+    };
+    common_vendor.onMounted(() => {
+      loadData();
+    });
+    expose({
+      loadData
+    });
     return (_ctx, _cache) => {
-      return {};
+      return {
+        a: common_vendor.f(borrowList.value, (borrow, k0, i0) => {
+          return {
+            a: "49f63f64-0-" + i0,
+            b: common_vendor.p({
+              returnItem: borrow
+            }),
+            c: borrow._id
+          };
+        })
+      };
     };
   }
 });

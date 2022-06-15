@@ -7,7 +7,7 @@
 			<view class="gear_others">
 				<view class="gear_tag gear_status_tag"
 					:class="{free: gear.status === GearStatus.free, booked: gear.status == GearStatus.booked, lend: gear.status == GearStatus.lend}">
-					{{GearStatusString[gear.status]}}
+					<view>{{GearStatusString[gear.status]}}</view>
 				</view>
 				<view class="gear_tag">{{gear.barcode}}</view>
 				<view class="gear_tag">{{gear.type}}</view>

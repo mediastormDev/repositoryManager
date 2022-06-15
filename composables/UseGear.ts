@@ -1,5 +1,5 @@
 import { ref } from "vue"
-import { getAssets, getAssetsByType } from '@/common/apis/assets.js';
+import { getAssets, getAssetsByType, getFav } from '@/common/apis/assets.js';
 import { previewTicket } from '@/common/apis/borrow.js';
 
 export enum GearStatus {
@@ -31,8 +31,9 @@ export type TypeItem = {
 	selected: Boolean;
 }
 
-const gearList = ref < any[] > ([]);
-const nowGearList = ref < any[] > ([]);
+const gearList = ref<any[]>([]);
+const nowGearList = ref<any[]>([]);
+const nowType = ref('');
 
 export default () => {
 
@@ -50,23 +51,44 @@ export default () => {
 		})
 	}
 
-	const getMyAssetByType = (type) => {
-		return getAssetsByType(type).then(res => {
+	const getMyAssetByType = (type, pendingLentAt?, pendingReturnAt?) => {
+		console.log('pendingLentAt', pendingLentAt, typeof pendingLentAt);
+		console.log('pendingReturnAt', pendingReturnAt);
+		if ((pendingLentAt !== undefined) && (pendingReturnAt !== undefined)) {
+			return getAssetsByType(type, pendingLentAt, pendingReturnAt).then(res => {
+				nowGearList.value = res;
+				console.log('nowGearList', nowGearList.value)
+				return res;
+			})
+		} else {
+			return getAssetsByType(type).then(res => {
+				nowGearList.value = res;
+				console.log('nowGearList', nowGearList.value)
+				return res;
+			})
+		}
+
+	}
+
+	const getMyFavList = (pendingLentAt?, pendingReturnAt?) => {
+		return getFav(pendingLentAt, pendingReturnAt).then(res => {
 			nowGearList.value = res;
-			console.log('nowGearList', nowGearList.value)
+			console.log('fav', res);
 			return res;
 		})
 	}
-	
+
 	const getBookInfo = (barcode) => {
 		return previewTicket(barcode);
 	}
 
 	return {
 		getAssetList,
+		getMyFavList,
 		getMyAssetByType,
 		getBookInfo,
 		nowGearList,
+		nowType,
 		gearList
 	}
 }

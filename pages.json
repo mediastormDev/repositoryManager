@@ -9,7 +9,8 @@
 		{
 			"path": "pages/order/index",
 			"style": {
-				"navigationBarTitleText": "工单"
+				"navigationBarTitleText": "工单",
+				"enablePullDownRefresh": true
 			}
 		}
 	    ,{

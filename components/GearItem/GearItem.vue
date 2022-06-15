@@ -10,15 +10,13 @@
 </template>
 
 <script setup lang="ts">
+	import {
+		GearStatus
+	} from '../../composables/UseGear.js';
+	
 	const props = defineProps < {
 		gear: any,
 	} > ()
-
-	enum GearStatus {
-		free,
-		booked,
-		lend,
-	}
 
 	// const emit = defineEmits(['clickGearItem'])
 

@@ -45,6 +45,7 @@
 		background: rgba(0, 0, 0, 0.1);
 		animation-name: opacityAn;
 		animation-duration: .1s;
+		z-index: 9;
 
 		.drawer_body {
 			background-color: white;

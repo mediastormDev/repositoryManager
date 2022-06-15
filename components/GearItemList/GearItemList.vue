@@ -2,8 +2,8 @@
 	<scroll-view scroll-y scroll-with-animation class="scroll_view">
 		<view class="grid_view">
 			<!-- uni-app bug 组件化后会导致点击一次变成两次，暂时不使用组件 -->
-			<view class="gear_item" v-for="gear in gearList" :key="gear._id" :gear="gear" @click="clickGear(gear)">
-				<image class="gear_pic" src="../../static/logo.png"></image>
+			<view class="gear_item" v-for="gear in nowGearList" :key="gear._id" :gear="gear" @click="clickGear(gear)">
+				<image class="gear_pic" src="../../static/logo.png" mode="aspectFit"></image>
 				<view class="gear_title">{{gear.name}}</view>
 				<view class="gear_status"
 					:class="{free: gear.status == GearStatus.free, booked: gear.status == GearStatus.booked,lend: gear.status == GearStatus.lend}">
@@ -17,13 +17,14 @@
 	<DrawerView ref="drawerRef">
 		<view v-if="selectedGear">
 			<GearInfoView :gear="selectedGear" />
-			<view style="margin-top: 5px;">
-				<OrderItemView v-for="book in bookInfo" :key="book._id" :info="book" />
+			<view class="order" style="margin-top: 5px;">
+				<scroll-view scroll-y scroll-with-animation style="height: 100px;">
+					<OrderItemView v-for="book in bookInfo" :key="book._id" :info="book" />
+				</scroll-view>
 			</view>
-			<view style="height: 30px;"></view>
-			<view class="button_view">
-				<button class="coll_button">收藏</button>
-				<button @click.stop="toBook" class="book_button">预约</button>
+			<view class="button_view_2">
+				<button @click.stop="addToMyFav" class="coll_button">{{nowType == '收藏'?'取消收藏':'收藏'}}</button>
+				<button @click.stop="toBook" class="book_button">{{isAdmin?'立即借出':'预约'}}</button>
 			</view>
 		</view>
 	</DrawerView>
@@ -42,26 +43,68 @@
 	} from '../../composables/UseGear.ts';
 	import OrderItemView from '../OrderItem/OrderItem.vue';
 	import GearInfoView from '../GearInfoView/GearInfoView.vue';
+	import UseSelectList from '@/composables/UseSelectList.js';
+	import {
+		addFav,
+		removeFav
+	} from '@/common/apis/fav.js';
+	import UseToken from '@/composables/UseToken.js';
 
 	const {
+		isAdmin
+	} = UseToken();
+
+	const {
+		nowType,
 		getBookInfo,
 		nowGearList
 	} = UseGear();
+	const {
+		selectedGears,
+		addItem,
+		removeItem,
+	} = UseSelectList();
 
 	const drawerRef = ref(null);
 	const selectedGear = ref < any > ();
 	const bookInfo = ref < any[] > ();
 
-	const gearList = ref < any[] > ([]);
-
 	watch(nowGearList, (cur) => {
-		console.log('某类型的设备列表', cur)
-		gearList.value = cur;
+		for (let i = 0; i < selectedGears.value.length; i++) {
+			const added = selectedGears.value[i];
+			for (let i = 0; i < cur.length; i++) {
+				const newItem = cur[i];
+				if (added._id == newItem._id) {
+					newItem.selected = true;
+				}
+			}
+		}
 	})
 
+	const addToMyFav = () => {
+		console.log('gear', selectedGear.value);
+		if (nowType.value == '收藏') {
+			removeFav(selectedGear.value._id).then(() => {
+				uni.showToast({
+					title: '已取消'
+				})
+			})
+		} else {
+			addFav(selectedGear.value._id).then(() => {
+				uni.showToast({
+					title: '已收藏'
+				})
+			})
+		}
+
+	}
+
 	const selectGearItem = (gear: any) => {
-		if (gear.status == GearStatus.free) {
-			gear.selected = !gear.selected;
+		gear.selected = !gear.selected;
+		if (gear.selected) {
+			addItem(gear);
+		} else {
+			removeItem(gear);
 		}
 	}
 
@@ -85,14 +128,14 @@
 				})
 			}
 		})
-		
-		
+
+
 	}
 </script>
 
 <style lang="less" scoped>
 	.scroll_view {
-		height: 100%;
+		height: 100vh;
 		background-color: white;
 
 		.grid_view {
@@ -159,7 +202,7 @@
 		}
 	}
 
-	.button_view {
+	.button_view_2 {
 		display: flex;
 		margin: 10px 0;
 

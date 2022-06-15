@@ -18,7 +18,9 @@
 
 	const {
 		nowGearList,
+		getMyFavList,
 		gearList,
+		nowType,
 		getMyAssetByType
 	} = UseGear();
 
@@ -31,12 +33,22 @@
 
 	watch(gearList, (cur) => {
 		console.log('cur', cur);
-		typeList.value = cur;
+		nowType.value = cur[0].name
+		typeList.value = [{
+			name: '收藏',
+			selected: false
+		}, ...cur];
 	})
-	
+
 	const loadAssetByType = (type) => {
 		getMyAssetByType(type).then(res => {
-			console.log('某类型的资产', res);
+			console.log('某类型的资产');
+		})
+	}
+
+	const loadMyFav = () => {
+		getMyFavList().then(res => {
+			console.log('fav', res);
 		})
 	}
 
@@ -44,7 +56,14 @@
 		typeList.value.map((item, i) => {
 			if (i === index) {
 				item.selected = true;
-				loadAssetByType(item.name);
+				nowType.value = item.name;
+				console.log('nowType', nowType.value)
+				if (item.name == '收藏') {
+					loadMyFav();
+				} else {
+					loadAssetByType(item.name);
+				}
+
 			} else {
 				item.selected = false;
 			}
@@ -58,7 +77,7 @@
 		height: 100%;
 
 		.scroll_view {
-			height: 100%;
+			height: 100vh;
 			background-color: #F4F6F7;
 		}
 	}

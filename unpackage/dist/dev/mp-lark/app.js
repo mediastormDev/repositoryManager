@@ -8,14 +8,18 @@ if (!Math) {
   "./pages/BookGears/BookGears.js";
 }
 const _sfc_main = {
-  onLaunch: function() {
-    console.log("App Launch");
-  },
-  onShow: function() {
-    console.log("App Show");
-  },
-  onHide: function() {
-    console.log("App Hide");
+  setup(__props) {
+    common_vendor.onLaunch(() => {
+      console.log("App Launch");
+    });
+    common_vendor.onShow(() => {
+      console.log("App Show123");
+    });
+    common_vendor.onHide(() => {
+      console.log("App Hide");
+    });
+    return () => {
+    };
   }
 };
 var App = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__file", "/Users/ysjf-jimmy/Documents/HBuilderProjects/\u5E93\u5B58\u7BA1\u7406/App.vue"]]);

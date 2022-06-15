@@ -1,12 +1,11 @@
 <template>
 	<view class="my_return_item">
 		<view class="top_view">
-			<GearInfoView imageSize="mini" />
-			<view><button size="mini" class="return_btn">归还</button></view>
+			<GearInfoView :gear="returnItem.asset" imageSize="mini" />
+			<view><button size="mini" class="return_btn" @click="onClickReturn">归还</button></view>
 		</view>
 		<view>
-			<OrderItem bgColor="white" />
-			<OrderItem bgColor="white" />
+			<OrderItem v-for="borrow in returnItem.borrows" :info="borrow" bgColor="white" />
 		</view>
 	</view>
 </template>
@@ -14,6 +13,17 @@
 <script setup lang="ts">
 	import GearInfoView from '../GearInfoView/GearInfoView.vue';
 	import OrderItem from '../OrderItem/OrderItem.vue';
+
+	const props = defineProps < {
+		returnItem: any
+	} > ()
+
+	const onClickReturn = () => {
+		console.log('提醒归还')
+		uni.showToast({
+			title: '请联系管理员归还'
+		})
+	}
 </script>
 
 <style lang="less">
@@ -32,7 +42,7 @@
 			border-radius: 10px;
 			color: #A2662A;
 			border: none;
-			padding: 12px 16px;
+			padding: 6px 16px;
 		}
 	}
 </style>

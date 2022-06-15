@@ -51,10 +51,15 @@
   background-color: white;
   padding: 10px;
   padding-bottom: 44px;
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+  display: flex;
+  align-items: center;
+}
+.book_button_view > button {
+  flex: 1;
 }
 .book_button_view .book_button {
   background: #FC6294;
