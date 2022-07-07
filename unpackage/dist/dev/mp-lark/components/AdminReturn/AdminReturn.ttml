@@ -1,1 +1,1 @@
-<view><view tt:for="{{a}}" tt:for-item="borrow" tt:key="c" style="margin-top:10px"><admin-return-item-view tt:if="{{borrow.b}}" u-i="{{borrow.a}}" bind:__l="__l" u-p="{{borrow.b}}"/></view></view>
+<admin-return-item-view tt:for="{{a}}" tt:for-item="borrow" tt:key="a" u-i="{{borrow.b}}" bind:__l="__l" u-p="{{borrow.c}}"/>

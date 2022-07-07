@@ -5,8 +5,8 @@
 }
 .my_return_item .top_view {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  margin-top: 10px;
 }
 .my_return_item .return_btn {
   background: #8D87B6;

@@ -14,6 +14,7 @@ const GearListView = () => "../../components/TypeListView/TypeListView.js";
 const GearItemList = () => "../../components/GearItemList/GearItemList.js";
 const GearFilters = () => "../../components/GearFilter/GearFilter.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "index",
   setup(__props) {
     const {
       nowGearList,
@@ -40,7 +41,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           console.log("login res", res);
           common_apis_login.login(res.code).then(() => {
             getAssetList().then((res2) => {
-              console.log("res", res2);
+              console.log("res444", res2);
             });
             common_apis_login.getMyprofile();
           });

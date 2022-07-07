@@ -40,7 +40,7 @@
 	const tabsIndex = ref(0);
 
 	const clickTabs = (index: Number) => {
-		console.log('isAdmin.value', isAdmin.value);
+		console.log('isAdmin.value123', isAdmin.value);
 		tabsIndex.value = index;
 	}
 

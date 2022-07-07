@@ -1,6 +1,7 @@
 <template>
 	<view class="gear_item">
-		<image class="gear_pic" src="../../static/logo.png"></image>
+		<image class="gear_pic" :src="gear.imageUrl || '../../static/logo.png'"></image>
+		<!-- <image class="gear_pic" src="../../static/logo.png"></image> -->
 		<view class="gear_title">{{gear.name}}</view>
 		<view class="gear_status"
 			:class="{free: gear.status == GearStatus.free, booked: gear.status == GearStatus.booked,lend: gear.status == GearStatus.lend}">

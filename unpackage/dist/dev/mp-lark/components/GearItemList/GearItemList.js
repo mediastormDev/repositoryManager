@@ -14,6 +14,7 @@ const DrawerView = () => "../Drawder/Drawder.js";
 const OrderItemView = () => "../OrderItem/OrderItem.js";
 const GearInfoView = () => "../GearInfoView/GearInfoView.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "GearItemList",
   setup(__props) {
     const {
       isAdmin
@@ -90,15 +91,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.e({
         a: common_vendor.f(common_vendor.unref(nowGearList), (gear, k0, i0) => {
           return {
-            a: common_vendor.t(gear.name),
-            b: gear.status == common_vendor.unref(composables_UseGear.GearStatus).free ? 1 : "",
-            c: gear.status == common_vendor.unref(composables_UseGear.GearStatus).booked ? 1 : "",
-            d: gear.status == common_vendor.unref(composables_UseGear.GearStatus).lend ? 1 : "",
-            e: common_vendor.o(($event) => selectGearItem(gear)),
-            f: gear.selected ? "" : "#F4F6F7",
-            g: gear._id,
-            h: gear,
-            i: common_vendor.o(($event) => clickGear(gear))
+            a: gear.imageUrl || "../../static/logo.png",
+            b: common_vendor.t(gear.name),
+            c: gear.status == common_vendor.unref(composables_UseGear.GearStatus).free ? 1 : "",
+            d: gear.status == common_vendor.unref(composables_UseGear.GearStatus).booked ? 1 : "",
+            e: gear.status == common_vendor.unref(composables_UseGear.GearStatus).lend ? 1 : "",
+            f: common_vendor.o(($event) => selectGearItem(gear)),
+            g: gear.selected ? "" : "#F4F6F7",
+            h: gear._id,
+            i: gear,
+            j: common_vendor.o(($event) => clickGear(gear))
           };
         }),
         b: selectedGear.value

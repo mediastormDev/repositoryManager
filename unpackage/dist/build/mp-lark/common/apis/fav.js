@@ -1,0 +1,1 @@
+"use strict";var e=require("../http/index.js");exports.addFav=t=>e.request("/api/fav/add",{assetId:t},"POST").then((e=>e)),exports.removeFav=t=>e.request("/api/fav/remove",{assetId:t},"POST").then((e=>e));

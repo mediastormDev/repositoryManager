@@ -251,12 +251,16 @@
 		console.log('barcodes', barcodes);
 		console.log('startDate', startDate.value);
 		console.log('endDate', endDate.value);
+		// uni.showLoading({
+		// 	title: '预约中'
+		// })
 		adminBorrow({
 			barcodes,
 			openId: adminChooseUser.value.openId,
 			pendingLentAt: startDate.value,
 			pendingReturnAt: endDate.value
 		}).then(res => {
+			// uni.hideLoading()
 			uni.showToast({
 				title: '预定成功'
 			})

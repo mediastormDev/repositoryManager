@@ -8,6 +8,7 @@ if (!Math) {
 }
 const MyReturnItemView = () => "../MyReturnItem/MyReturnItem.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "MyReturns",
   setup(__props, { expose }) {
     const {
       openId

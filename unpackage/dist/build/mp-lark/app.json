@@ -1,0 +1,31 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/order/index",
+    "pages/BookGears/BookGears"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "库存管理",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "selectedColor": "#24252C",
+    "list": [
+      {
+        "iconPath": "static/gear_list.png",
+        "selectedIconPath": "static/gear_list_selected.png",
+        "pagePath": "pages/index/index",
+        "text": "设备库"
+      },
+      {
+        "iconPath": "static/order_list.png",
+        "selectedIconPath": "static/order_list_selected.png",
+        "pagePath": "pages/order/index",
+        "text": "工单"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

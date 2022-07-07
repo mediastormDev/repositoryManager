@@ -1,18 +1,18 @@
 <template>
 	<view class="my_return_item">
-		<view class="top_view">
-			<GearInfoView :gear="borrowItem" imageSize="mini" />
-			<view><button size="mini" class="return_btn" @click="onClickBorrow">借出</button></view>
-		</view>
-		<view>
-			<OrderItem v-for="borrow in ticketInfo.borrows" :info="borrow" bgColor="white" />
+		<OrderItem :info="borrowItems[0]" bgColor="white" />
+		<view class="top_view" v-for="borrow in borrowItems" :key="borrow._id">
+			<GearInfoView :gear="borrow.asset" imageSize="mini" />
+			<view v-if="borrow.asset.status !== 'INUSE'" style="text-align: right;"><button size="mini" class="return_btn" @click="onClickBorrow(borrow._id)">借出</button>
+			</view>
 		</view>
 	</view>
 </template>
 
 <script setup lang="ts">
 	import {
-		inject
+		inject,
+		onMounted
 	} from 'vue';
 	import GearInfoView from '../GearInfoView/GearInfoView.vue';
 	import OrderItem from '../OrderItem/OrderItem.vue';
@@ -24,17 +24,15 @@
 	} from 'lodash';
 
 	const props = defineProps < {
-		borrowItem: any,
-		ticketid: String,
-		ticketInfo: any,
+		borrowItems: any[],
 		loadData: Function
 	} > ()
 
-	const onClickBorrow = debounce(() => {
+	const onClickBorrow = debounce((ticketid) => {
 		uni.showLoading({
 			title: '请稍候..'
 		})
-		lendGear(props.ticketid).then(res => {
+		lendGear(ticketid).then(res => {
 			uni.hideLoading()
 			uni.showToast({
 				title: "已借出"
@@ -42,6 +40,10 @@
 			props.loadData();
 		})
 	}, 100)
+
+	onMounted(() => {
+		console.log("admin item mounted", props.borrowItems);
+	})
 </script>
 
 <style lang="less">
@@ -52,8 +54,8 @@
 
 		.top_view {
 			display: flex;
-			align-items: center;
-			justify-content: space-between;
+			flex-direction: column;
+			margin-top: 10px;
 		}
 
 		.return_btn {

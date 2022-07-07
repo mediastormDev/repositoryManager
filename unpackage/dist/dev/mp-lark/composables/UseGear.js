@@ -18,18 +18,47 @@ const GearStatusString = {
 const gearList = common_vendor.ref([]);
 const nowGearList = common_vendor.ref([]);
 const nowType = common_vendor.ref("");
+const orderList = [
+  "\u6444\u5F71\u673A",
+  "\u5FAE\u5355",
+  "\u8FD0\u52A8\u76F8\u673A",
+  "EF\u53E3",
+  "E\u5361\u53E3",
+  "RF\u53E3",
+  "V\u53E3\u7535\u6C60",
+  "FZ100\u7535\u6C60",
+  "970\u7535\u6C60",
+  "LPE6\u7535\u6C60",
+  "\u56FE\u4F20",
+  "\u76D1\u89C6\u5668",
+  "\u7A33\u5B9A\u5668",
+  "\u4E09\u811A\u67B6",
+  "\u4E91\u53F0",
+  "\u6ED1\u8F68",
+  "\u6EE4\u955C"
+].reverse();
 var UseGear = () => {
   const getAssetList = () => {
     return common_apis_assets.getAssets().then((res) => {
-      return gearList.value = res.map((item, index) => {
-        if (index === 0) {
-          getMyAssetByType(item);
-        }
+      let tempArr = res.map((item, index) => {
         return {
           name: item,
-          selected: index === 0
+          selected: false
         };
       });
+      tempArr = tempArr.sort((a, b) => {
+        return orderList.indexOf(b.name) - orderList.indexOf(a.name);
+      });
+      tempArr.map((item, index) => {
+        if (index === 0) {
+          getMyAssetByType(item.name);
+        }
+        item.selected = index === 0;
+        return item;
+      });
+      console.log("tempArr", tempArr);
+      gearList.value = tempArr;
+      return gearList.value;
     });
   };
   const getMyAssetByType = (type, pendingLentAt, pendingReturnAt) => {

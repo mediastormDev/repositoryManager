@@ -11,6 +11,7 @@ const GearInfoView = () => "../../components/GearInfoView/GearInfoView.js";
 const DatePickerView = () => "../../components/DatePickerView/DatePickerView.js";
 const OrderItemView = () => "../../components/OrderItem/OrderItem.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "BookGears",
   setup(__props) {
     const {
       isAdmin,

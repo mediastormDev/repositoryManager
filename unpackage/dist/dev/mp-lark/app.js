@@ -8,6 +8,7 @@ if (!Math) {
   "./pages/BookGears/BookGears.js";
 }
 const _sfc_main = {
+  __name: "App",
   setup(__props) {
     common_vendor.onLaunch(() => {
       console.log("App Launch");

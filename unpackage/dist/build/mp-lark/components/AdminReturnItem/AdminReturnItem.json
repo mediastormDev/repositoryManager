@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "gear-info-view": "../GearInfoView/GearInfoView",
+    "order-item": "../OrderItem/OrderItem"
+  }
+}

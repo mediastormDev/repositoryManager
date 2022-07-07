@@ -10,6 +10,7 @@ if (!Math) {
 }
 const TypeListItem = () => "../TypeListItem/TypeListItem.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "TypeListView",
   setup(__props) {
     const {
       nowGearList,

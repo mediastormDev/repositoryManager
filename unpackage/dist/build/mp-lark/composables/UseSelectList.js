@@ -1,0 +1,1 @@
+"use strict";const e=require("../common/vendor.js").ref([]);exports.UseSelectList=()=>{const t=t=>{let l=-1;for(let s=0;s<e.value.length;s++){e.value[s]._id==t._id&&(l=s)}e.value.splice(l,1)};return{addItem:t=>{e.value.some((e=>e._id==t._id))||e.value.push(t)},removeItems:e=>{for(let l=0;l<e.length;l++){let s=e[l];s.selected=!1,t(s)}},removeItem:t,selectedGears:e}};

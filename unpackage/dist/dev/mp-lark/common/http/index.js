@@ -6,9 +6,12 @@ const {
 } = composables_UseToken.UseToken();
 const request = (url, data, method = "GET") => {
   console.log("token", token.value);
+  common_vendor.uni.showLoading({
+    title: "\u8BF7\u7A0D\u5019"
+  });
   return new Promise((resolve, reject) => {
     common_vendor.uni.request({
-      url: "http://10.80.1.4:1627" + url,
+      url: "https://yidea.ysjf.com" + url,
       data,
       header: {
         authorization: `Bearer ${token.value}`
@@ -16,10 +19,12 @@ const request = (url, data, method = "GET") => {
       method,
       success: (res) => {
         console.log("http request", res);
+        common_vendor.uni.hideLoading();
         resolve(res.data);
       },
       fail: (error) => {
         console.error(error);
+        common_vendor.uni.hideLoading();
         reject(error);
       }
     });

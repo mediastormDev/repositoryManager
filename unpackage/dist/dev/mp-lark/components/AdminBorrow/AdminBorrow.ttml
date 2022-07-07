@@ -1,1 +1,1 @@
-<admin-borrow-item tt:for="{{a}}" tt:for-item="borrow" u-i="{{borrow.a}}" bind:__l="__l" u-p="{{borrow.b}}"/>
+<admin-borrow-item tt:for="{{a}}" tt:for-item="borrow" tt:key="a" u-i="{{borrow.b}}" bind:__l="__l" u-p="{{borrow.c}}"/>

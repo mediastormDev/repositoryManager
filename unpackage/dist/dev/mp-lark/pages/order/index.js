@@ -9,6 +9,7 @@ const MyReturnsView = () => "../../components/MyReturns/MyReturns.js";
 const AdminReturnsView = () => "../../components/AdminReturn/AdminReturn.js";
 const AdminBorrowView = () => "../../components/AdminBorrow/AdminBorrow.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "index",
   setup(__props) {
     const orderViewRef = common_vendor.ref(null);
     const myreturnsRef = common_vendor.ref(null);
@@ -19,7 +20,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     } = composables_UseToken.UseToken();
     const tabsIndex = common_vendor.ref(0);
     const clickTabs = (index) => {
-      console.log("isAdmin.value", isAdmin.value);
+      console.log("isAdmin.value123", isAdmin.value);
       tabsIndex.value = index;
     };
     common_vendor.onPullDownRefresh(() => {

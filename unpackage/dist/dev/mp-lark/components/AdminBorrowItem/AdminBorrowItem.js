@@ -4,24 +4,23 @@ var common_apis_borrow = require("../../common/apis/borrow.js");
 require("../../common/http/index.js");
 require("../../composables/UseToken.js");
 if (!Math) {
-  (GearInfoView + OrderItem)();
+  (OrderItem + GearInfoView)();
 }
 const GearInfoView = () => "../GearInfoView/GearInfoView.js";
 const OrderItem = () => "../OrderItem/OrderItem.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "AdminBorrowItem",
   props: {
-    borrowItem: { type: null, required: true },
-    ticketid: { type: null, required: true },
-    ticketInfo: { type: null, required: true },
+    borrowItems: { type: Array, required: true },
     loadData: { type: Function, required: true }
   },
   setup(__props) {
     const props = __props;
-    const onClickBorrow = common_vendor.lodash.exports.debounce(() => {
+    const onClickBorrow = common_vendor.lodash.exports.debounce((ticketid) => {
       common_vendor.uni.showLoading({
         title: "\u8BF7\u7A0D\u5019.."
       });
-      common_apis_borrow.lendGear(props.ticketid).then((res) => {
+      common_apis_borrow.lendGear(ticketid).then((res) => {
         common_vendor.uni.hideLoading();
         common_vendor.uni.showToast({
           title: "\u5DF2\u501F\u51FA"
@@ -29,21 +28,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         props.loadData();
       });
     }, 100);
+    common_vendor.onMounted(() => {
+      console.log("admin item mounted", props.borrowItems);
+    });
     return (_ctx, _cache) => {
       return {
         a: common_vendor.p({
-          gear: __props.borrowItem,
-          imageSize: "mini"
+          info: __props.borrowItems[0],
+          bgColor: "white"
         }),
-        b: common_vendor.o((...args) => common_vendor.unref(onClickBorrow) && common_vendor.unref(onClickBorrow)(...args)),
-        c: common_vendor.f(__props.ticketInfo.borrows, (borrow, k0, i0) => {
-          return {
+        b: common_vendor.f(__props.borrowItems, (borrow, k0, i0) => {
+          return common_vendor.e({
             a: "1e85eeb8-1-" + i0,
             b: common_vendor.p({
-              info: borrow,
-              bgColor: "white"
-            })
-          };
+              gear: borrow.asset,
+              imageSize: "mini"
+            }),
+            c: borrow.asset.status !== "INUSE"
+          }, borrow.asset.status !== "INUSE" ? {
+            d: common_vendor.o(($event) => common_vendor.unref(onClickBorrow)(borrow._id))
+          } : {}, {
+            e: borrow._id
+          });
         })
       };
     };

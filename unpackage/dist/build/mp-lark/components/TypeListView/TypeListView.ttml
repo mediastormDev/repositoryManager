@@ -1,0 +1,1 @@
+<view class="gear_list"><scroll-view scroll-y scroll-with-animation class="scroll_view"><type-list-item tt:for="{{a}}" tt:for-item="type" tt:key="a" bindselectItem="{{b}}" u-i="{{type.b}}" bind:__l="__l" u-p="{{type.c}}"/></scroll-view></view>

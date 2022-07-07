@@ -6,6 +6,7 @@ require("../../common/http/index.js");
 require("../../composables/UseToken.js");
 require("../../common/apis/borrow.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "GearInfoView",
   props: {
     gear: { type: null, required: true },
     imageSize: { type: null, required: true }
@@ -17,7 +18,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     return (_ctx, _cache) => {
       return {
-        a: __props.gear.image,
+        a: __props.gear.imageUrl || "../../static/logo.png",
         b: __props.imageSize == "small" ? 1 : "",
         c: common_vendor.t(__props.gear.name),
         d: common_vendor.t(__props.gear.remark),

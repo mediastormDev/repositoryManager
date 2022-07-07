@@ -1,6 +1,7 @@
 import { ref } from "vue"
 import { getAssets, getAssetsByType, getFav } from '@/common/apis/assets.js';
 import { previewTicket } from '@/common/apis/borrow.js';
+import { isDate } from "lodash";
 
 export enum GearStatus {
 	free = 'IDLE',
@@ -34,20 +35,32 @@ export type TypeItem = {
 const gearList = ref<any[]>([]);
 const nowGearList = ref<any[]>([]);
 const nowType = ref('');
+const orderList = ['摄影机', '微单', '运动相机', 'EF口', 'E卡口', 'RF口', 'V口电池',
+	'FZ100电池', '970电池', 'LPE6电池', '图传', '监视器', '稳定器', '三脚架', '云台', '滑轨', '滤镜'].reverse()
 
 export default () => {
 
 	const getAssetList = () => {
 		return getAssets().then(res => {
-			return gearList.value = res.map((item, index) => {
-				if (index === 0) {
-					getMyAssetByType(item);
-				}
+			let tempArr = res.map((item, index) => {
 				return {
 					name: item,
-					selected: index === 0
+					selected: false
 				}
 			})
+			tempArr = tempArr.sort((a, b) => {
+				return orderList.indexOf(b.name) - orderList.indexOf(a.name);
+			});
+			tempArr.map((item, index) => {
+				if (index === 0) {
+					getMyAssetByType(item.name);
+				}
+				item.selected = index === 0
+				return item
+			})
+			console.log('tempArr', tempArr);
+			gearList.value = tempArr;
+			return gearList.value;
 		})
 	}
 

@@ -8,6 +8,7 @@ if (!Math) {
 }
 const MyOrderItem = () => "../MyOrderItem/MyOrderItem.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "MyOrders",
   setup(__props, { expose }) {
     const orderList = common_vendor.ref([]);
     const loadData = () => {

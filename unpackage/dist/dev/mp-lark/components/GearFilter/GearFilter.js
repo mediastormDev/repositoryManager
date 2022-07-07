@@ -12,6 +12,7 @@ if (!Math) {
 const DrawderView = () => "../Drawder/Drawder.js";
 const DatePickerView2 = () => "../DatePickerView/DatePickerView.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "GearFilter",
   setup(__props) {
     const {
       nowType,

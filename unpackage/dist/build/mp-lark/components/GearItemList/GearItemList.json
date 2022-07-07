@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "drawer-view": "../Drawder/Drawder",
+    "order-item-view": "../OrderItem/OrderItem",
+    "gear-info-view": "../GearInfoView/GearInfoView"
+  }
+}

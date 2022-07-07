@@ -1,9 +1,12 @@
 <template>
-	<view>
+	<!-- 	<view>
 		<view style="margin-top: 10px;" v-for="borrow in borrowList" :key="borrow._id">
 			<AdminReturnItemView :returnItem="borrow" :loadData="loadData" />
 		</view>
-	</view>
+	</view> -->
+
+	<AdminReturnItemView v-for="borrow in borrowList" :loadData="loadData" :key="borrow._id"
+		:borrowItems="borrow && borrow.borrows" />
 </template>
 
 <script setup lang="ts">
@@ -15,6 +18,9 @@
 	import {
 		borrowListByType
 	} from '@/common/apis/borrow.js';
+	import {
+		getTicketsAll
+	} from '@/common/apis/ticket.js';
 	import UseToken from '@/composables/UseToken.js';
 
 	const {
@@ -25,8 +31,16 @@
 
 	const loadData = () => {
 		console.log('openId', openId.value)
-		borrowListByType('INUSE').then(res => {
-			borrowList.value = res;
+		// borrowListByType('INUSE').then(res => {
+		// 	borrowList.value = res;
+		// 	console.log("borrowList", borrowList.value);
+		// 	uni.stopPullDownRefresh();
+		// })
+
+		getTicketsAll().then(res => {
+			borrowList.value = res.filter(item => {
+				return item.borrows.filter(borrow => borrow.asset.status == "INUSE").length
+			});
 			console.log("borrowList", borrowList.value);
 			uni.stopPullDownRefresh();
 		})
@@ -35,7 +49,7 @@
 	onMounted(() => {
 		loadData();
 	})
-	
+
 	defineExpose({
 		loadData
 	})

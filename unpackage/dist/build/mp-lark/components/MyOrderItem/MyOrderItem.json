@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "gear-info-view": "../GearInfoView/GearInfoView"
+  }
+}

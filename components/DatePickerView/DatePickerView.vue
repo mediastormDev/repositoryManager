@@ -2,22 +2,22 @@
 	<view class="datepicker_view" v-if="show">
 		<view class="date_btn_view">
 			<button @click="closePicker">取消</button>
-			<button @click="onConfirm">确认</button>
+			<button type="primary" @click="onConfirm" style="margin-left: 10px;">确认</button>
 		</view>
 		<view>{{oldDate}}</view>
 		<picker-view indicator-style="height: 50px;color:black;" mask-style="z-index: 0;" style="height: 750rpx;"
 			:value="value" @change="bindChange">
 			<picker-view-column style="text-align: center;">
-				<view v-for="month in months" style="line-height: 50px; text-align: center;">{{month}}月</view>
+				<view v-for="month in months" class="picker_text">{{month}}月</view>
 			</picker-view-column>
 			<picker-view-column style="text-align: center;">
-				<view v-for="day in days" style="line-height: 50px; text-align: center;">{{day}}日</view>
+				<view v-for="day in days" class="picker_text">{{day}}日</view>
 			</picker-view-column>
 			<picker-view-column>
-				<view v-for="hour in hours" style="line-height: 50px; text-align: center;">{{hour}}时</view>
+				<view v-for="hour in hours" class="picker_text">{{hour}}时</view>
 			</picker-view-column>
 			<picker-view-column>
-				<view v-for="min in minutes" style="line-height: 50px; text-align: center;">{{min}}分</view>
+				<view v-for="min in minutes" class="picker_text">{{min}}分</view>
 			</picker-view-column>
 		</picker-view>
 	</view>
@@ -108,16 +108,24 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
-		background-color: white;
+		background-color: #ccc;
 		z-index: 10;
 
 		.date_btn_view {
 			display: flex;
 			align-items: center;
+			margin: 10px;
+			background-color: #ccc;
 
 			>button {
 				flex: 1;
 			}
+		}
+
+		.picker_text {
+			line-height: 50px;
+			text-align: center;
+			font-size: 15px;
 		}
 	}
 </style>

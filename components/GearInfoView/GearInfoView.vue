@@ -1,6 +1,6 @@
 <template>
 	<view class="drawer_header">
-		<img class="drawer_img" :src="gear.image" alt="gear_img" :class="{drawer_img_small: imageSize=='small'}">
+		<img class="drawer_img" :src="gear.imageUrl || '../../static/logo.png'" alt="gear_img" :class="{drawer_img_small: imageSize=='small'}">
 		<view class="drawer_content">
 			<view class="gear_name">{{gear.name}}</view>
 			<view class="gear_remark">{{gear.remark}}</view>
@@ -99,15 +99,15 @@
 		}
 
 		.drawer_img {
-			width: 100px;
-			height: 100px;
+			width: 60px;
+			height: 60px;
 			background: #FFFFFF;
 			border: 1px solid #EEEEEE;
 		}
 
 		.drawer_img_small {
-			width: 60px;
-			height: 60px;
+			width: 50px;
+			height: 50px;
 			background: #FFFFFF;
 			border: 1px solid #EEEEEE;
 		}

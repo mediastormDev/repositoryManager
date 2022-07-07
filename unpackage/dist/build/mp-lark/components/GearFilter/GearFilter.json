@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "drawder-view": "../Drawder/Drawder",
+    "date-picker-view2": "../DatePickerView/DatePickerView"
+  }
+}

@@ -6,9 +6,12 @@ const {
 
 export const request = (url, data, method = 'GET') => {
 	console.log('token', token.value);
+	uni.showLoading({
+		title: '请稍候'
+	})
 	return new Promise((resolve, reject) => {
 		uni.request({
-			url: 'http://10.80.1.4:1627' + url,
+			url: 'https://yidea.ysjf.com' + url,
 			data,
 			header: {
 				authorization: `Bearer ${token.value}`,
@@ -16,10 +19,12 @@ export const request = (url, data, method = 'GET') => {
 			method: method,
 			success: (res) => {
 				console.log('http request', res)
+				uni.hideLoading();
 				resolve(res.data);
 			},
 			fail: (error) => {
 				console.error(error);
+				uni.hideLoading();
 				reject(error);
 			}
 		})

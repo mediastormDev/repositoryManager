@@ -6,6 +6,7 @@ if (!Math) {
 const GearInfoView = () => "../GearInfoView/GearInfoView.js";
 const OrderItem = () => "../OrderItem/OrderItem.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "MyReturnItem",
   props: {
     returnItem: { type: null, required: true }
   },

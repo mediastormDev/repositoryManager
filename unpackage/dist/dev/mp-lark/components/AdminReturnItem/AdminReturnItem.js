@@ -4,22 +4,23 @@ var common_apis_borrow = require("../../common/apis/borrow.js");
 require("../../common/http/index.js");
 require("../../composables/UseToken.js");
 if (!Math) {
-  (GearInfoView + OrderItem)();
+  (OrderItem + GearInfoView)();
 }
 const GearInfoView = () => "../GearInfoView/GearInfoView.js";
 const OrderItem = () => "../OrderItem/OrderItem.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "AdminReturnItem",
   props: {
-    returnItem: { type: null, required: true },
+    borrowItems: { type: Array, required: true },
     loadData: { type: Function, required: true }
   },
   setup(__props) {
     const props = __props;
-    const onClickReturn = () => {
+    const onClickReturn = (ticketid) => {
       common_vendor.uni.showLoading({
         title: "\u8BF7\u7A0D\u5019.."
       });
-      common_apis_borrow.returnGear(props.returnItem._id).then(() => {
+      common_apis_borrow.returnGear(ticketid).then(() => {
         common_vendor.uni.hideLoading();
         common_vendor.uni.showToast({
           title: "\u5DF2\u5F52\u8FD8"
@@ -30,18 +31,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       return {
         a: common_vendor.p({
-          gear: __props.returnItem.asset,
-          imageSize: "mini"
+          info: __props.borrowItems[0],
+          bgColor: "white"
         }),
-        b: common_vendor.o(onClickReturn),
-        c: common_vendor.f(__props.returnItem.borrows, (borrow, k0, i0) => {
-          return {
+        b: common_vendor.f(__props.borrowItems, (borrow, k0, i0) => {
+          return common_vendor.e({
             a: "e5c8f9cc-1-" + i0,
             b: common_vendor.p({
-              info: borrow,
-              bgColor: "white"
-            })
-          };
+              gear: borrow.asset,
+              imageSize: "mini"
+            }),
+            c: borrow.asset.status == "INUSE"
+          }, borrow.asset.status == "INUSE" ? {
+            d: common_vendor.o(($event) => onClickReturn(borrow._id))
+          } : {}, {
+            e: borrow._id
+          });
         })
       };
     };

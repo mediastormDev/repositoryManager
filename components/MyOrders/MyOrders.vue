@@ -9,6 +9,9 @@
 		ref,
 		onMounted
 	} from 'vue';
+	import {
+		onShow
+	} from '@dcloudio/uni-app';
 	import MyOrderItem from '../MyOrderItem/MyOrderItem.vue';
 	import {
 		getTickets
@@ -26,7 +29,7 @@
 	onMounted(() => {
 		loadData();
 	})
-	
+
 	defineExpose({
 		loadData
 	})

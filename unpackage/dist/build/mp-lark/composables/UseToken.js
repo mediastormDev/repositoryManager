@@ -1,0 +1,1 @@
+"use strict";var e=require("../common/vendor.js");const o=e.ref(""),n=e.ref("");exports.UseToken=()=>{const r=["ou_59fc5918c2fdf9106f0cc6ada7d0db1a"];return{isAdmin:e.computed$1((()=>(console.log("isAdmin",!!r.filter((e=>e==n.value)).length),!!r.filter((e=>e==n.value)).length))),token:o,openId:n}};

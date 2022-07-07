@@ -61,7 +61,7 @@
 				console.log('login res', res);
 				login(res.code).then(() => {
 					getAssetList().then(res => {
-						console.log('res', res);
+						console.log('res444', res);
 					});
 					
 					getMyprofile();

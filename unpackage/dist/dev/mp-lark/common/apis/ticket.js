@@ -40,6 +40,11 @@ const getTickets = () => {
     return res;
   });
 };
+const getTicketsAll = () => {
+  return common_http_index.request("/api/ticket/all", {}, "GET").then((res) => {
+    return res;
+  });
+};
 const removeGear = (ticketId, borrowId) => {
   return common_http_index.request(`/api/ticket/${ticketId}/${borrowId}/remove`, {}, "POST").then((res) => {
     return res;
@@ -48,6 +53,7 @@ const removeGear = (ticketId, borrowId) => {
 exports.cancelTicket = cancelTicket;
 exports.createTicket = createTicket;
 exports.getTickets = getTickets;
+exports.getTicketsAll = getTicketsAll;
 exports.previewTicket = previewTicket;
 exports.removeGear = removeGear;
 exports.updateTickeDate = updateTickeDate;

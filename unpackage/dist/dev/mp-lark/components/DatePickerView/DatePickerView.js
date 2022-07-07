@@ -1,6 +1,7 @@
 "use strict";
 var common_vendor = require("../../common/vendor.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "DatePickerView",
   emits: ["onConfirm"],
   setup(__props, { expose, emit }) {
     const date = common_vendor.ref(new Date());

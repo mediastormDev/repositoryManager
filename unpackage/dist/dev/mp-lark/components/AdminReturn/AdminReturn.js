@@ -1,6 +1,6 @@
 "use strict";
 var common_vendor = require("../../common/vendor.js");
-var common_apis_borrow = require("../../common/apis/borrow.js");
+var common_apis_ticket = require("../../common/apis/ticket.js");
 var composables_UseToken = require("../../composables/UseToken.js");
 require("../../common/http/index.js");
 if (!Math) {
@@ -8,6 +8,7 @@ if (!Math) {
 }
 const AdminReturnItemView = () => "../AdminReturnItem/AdminReturnItem.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "AdminReturn",
   setup(__props, { expose }) {
     const {
       openId
@@ -15,8 +16,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const borrowList = common_vendor.ref([]);
     const loadData = () => {
       console.log("openId", openId.value);
-      common_apis_borrow.borrowListByType("INUSE").then((res) => {
-        borrowList.value = res;
+      common_apis_ticket.getTicketsAll().then((res) => {
+        borrowList.value = res.filter((item) => {
+          return item.borrows.filter((borrow) => borrow.asset.status == "INUSE").length;
+        });
         console.log("borrowList", borrowList.value);
         common_vendor.uni.stopPullDownRefresh();
       });
@@ -31,12 +34,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return {
         a: common_vendor.f(borrowList.value, (borrow, k0, i0) => {
           return {
-            a: "1a0191b4-0-" + i0,
-            b: common_vendor.p({
-              returnItem: borrow,
-              loadData
-            }),
-            c: borrow._id
+            a: borrow._id,
+            b: "1a0191b4-0-" + i0,
+            c: common_vendor.p({
+              loadData,
+              borrowItems: borrow && borrow.borrows
+            })
           };
         })
       };

@@ -1,0 +1,1 @@
+<view tt:if="{{a}}" bindtap="{{c}}" class="{{('type_item') + ' ' + (d && 'select')}}">{{b}}</view>

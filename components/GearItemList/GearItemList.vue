@@ -3,7 +3,7 @@
 		<view class="grid_view">
 			<!-- uni-app bug 组件化后会导致点击一次变成两次，暂时不使用组件 -->
 			<view class="gear_item" v-for="gear in nowGearList" :key="gear._id" :gear="gear" @click="clickGear(gear)">
-				<image class="gear_pic" src="../../static/logo.png" mode="aspectFit"></image>
+				<image class="gear_pic" :src="gear.imageUrl || '../../static/logo.png'" mode="aspectFit"></image>
 				<view class="gear_title">{{gear.name}}</view>
 				<view class="gear_status"
 					:class="{free: gear.status == GearStatus.free, booked: gear.status == GearStatus.booked,lend: gear.status == GearStatus.lend}">

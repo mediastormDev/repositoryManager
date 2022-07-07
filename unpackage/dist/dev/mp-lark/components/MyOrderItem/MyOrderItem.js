@@ -10,6 +10,7 @@ if (!Math) {
 }
 const GearInfoView = () => "../GearInfoView/GearInfoView.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "MyOrderItem",
   props: {
     orderInfo: { type: null, required: true }
   },

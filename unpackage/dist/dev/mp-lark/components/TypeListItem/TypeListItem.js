@@ -1,6 +1,7 @@
 "use strict";
 var common_vendor = require("../../common/vendor.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+  __name: "TypeListItem",
   props: {
     typeItem: { type: null, required: true },
     index: { type: Number, required: true }

@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "admin-return-item-view": "../AdminReturnItem/AdminReturnItem"
+  }
+}

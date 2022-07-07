@@ -1,6 +1,6 @@
 {
     "name" : "库存管理",
-    "appid" : "",
+    "appid" : "__UNI__21885CA",
     "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -70,6 +70,6 @@
     },
     "vueVersion" : "3",
     "mp-lark" : {
-        "appid" : "cli_a217204bb479500b"
+        "appid" : "cli_a212d65246f8500c"
     }
 }

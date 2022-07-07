@@ -1,0 +1,1 @@
+<view><my-order-item tt:for="{{a}}" tt:for-item="order" tt:key="a" u-i="{{order.b}}" bind:__l="__l" u-p="{{order.c}}"/></view>
