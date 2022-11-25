@@ -4,7 +4,6 @@
 		<view v-if="!isAdmin" @click="clickTabs(1)" class="tab" :class="{selected: tabsIndex === 1}">归还设备</view>
 		<view v-if="isAdmin" @click="clickTabs(2)" class="tab" :class="{selected: tabsIndex === 2}">出借申请</view>
 		<view v-if="isAdmin" @click="clickTabs(3)" class="tab" :class="{selected: tabsIndex === 3}">归还设备</view>
-
 	</view>
 	<view>
 		<MyOrdersView ref="orderViewRef" v-show="tabsIndex === 0" />
@@ -37,7 +36,7 @@
 		isAdmin
 	} = UseToken();
 
-	const tabsIndex = ref(0);
+	const tabsIndex = ref(isAdmin.value ? 2 : 0);
 
 	const clickTabs = (index: Number) => {
 		console.log('isAdmin.value123', isAdmin.value);

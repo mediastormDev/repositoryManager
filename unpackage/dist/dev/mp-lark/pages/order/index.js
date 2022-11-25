@@ -18,7 +18,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const {
       isAdmin
     } = composables_UseToken.UseToken();
-    const tabsIndex = common_vendor.ref(0);
+    const tabsIndex = common_vendor.ref(isAdmin.value ? 2 : 0);
     const clickTabs = (index) => {
       console.log("isAdmin.value123", isAdmin.value);
       tabsIndex.value = index;
