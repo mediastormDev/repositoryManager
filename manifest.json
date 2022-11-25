@@ -71,5 +71,6 @@
     "vueVersion" : "3",
     "mp-lark" : {
         "appid" : "cli_a212d65246f8500c"
-    }
+    },
+    "locale" : "zh-Hans"
 }

@@ -1,9 +1,14 @@
 <template>
 	<view class="my_return_item">
-		<OrderItem :info="borrowItems[0]" bgColor="white" />
-		<view class="top_view" v-for="borrow in borrowItems" :key="borrow._id">
+		<view class="admin_return_view">
+			<OrderItem :info="borrowItems[0]" bgColor="white" />
+			<switch style="transform:scale(0.7)" @change="switch2Change" />
+		</view>
+		<button size="mini" class="return_btn" @click="onClickBorrowAll">一键借出</button>
+		<view v-show="showListStatus" class="top_view" v-for="borrow in borrowItems" :key="borrow._id">
 			<GearInfoView :gear="borrow.asset" imageSize="mini" />
-			<view v-if="borrow.asset.status !== 'INUSE'" style="text-align: right;"><button size="mini" class="return_btn" @click="onClickBorrow(borrow._id)">借出</button>
+			<view v-if="borrow.asset.status !== 'INUSE'" style="text-align: right;"><button size="mini"
+					class="return_btn" @click="onClickBorrow(borrow._id)">借出</button>
 			</view>
 		</view>
 	</view>
@@ -11,6 +16,7 @@
 
 <script setup lang="ts">
 	import {
+		ref,
 		inject,
 		onMounted
 	} from 'vue';
@@ -28,6 +34,12 @@
 		loadData: Function
 	} > ()
 
+	const showListStatus = ref(false);
+
+	const switch2Change = (e) => {
+		showListStatus.value = e.detail.value
+	}
+
 	const onClickBorrow = debounce((ticketid) => {
 		uni.showLoading({
 			title: '请稍候..'
@@ -41,6 +53,28 @@
 		})
 	}, 100)
 
+	const onClickBorrowAll = debounce(async () => {
+		uni.showLoading({
+			title: '请稍候..'
+		})
+		let failList = [];
+		for (let item of props.borrowItems) {
+			try {
+				await lendGear(item._id)
+			} catch (e) {
+				failList.push(item)
+			}
+		}
+		if (failList.length) {
+			uni.showModal({
+				title: "提示",
+				content: `有${failList.length}件借出失败，请手动借出`,
+			})
+		}
+		props.loadData();
+
+	}, 100)
+
 	onMounted(() => {
 		console.log("admin item mounted", props.borrowItems);
 	})
@@ -52,9 +86,16 @@
 		padding: 10px;
 		margin-top: 10px;
 
+		.admin_return_view {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+
 		.top_view {
 			display: flex;
-			flex-direction: column;
+			align-items: center;
+			justify-content: space-between;
 			margin-top: 10px;
 		}
 

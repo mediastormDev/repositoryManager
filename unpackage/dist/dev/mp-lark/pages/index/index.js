@@ -38,13 +38,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onMounted(() => {
       common_vendor.uni.login({
         complete: (res) => {
-          console.log("login res", res);
+          console.log("login complete", res);
+        },
+        success: (res) => {
+          console.log("login success", res);
           common_apis_login.login(res.code).then(() => {
             getAssetList().then((res2) => {
               console.log("res444", res2);
             });
             common_apis_login.getMyprofile();
           });
+        },
+        fail: (error) => {
+          console.error("login error", error);
         }
       });
     });

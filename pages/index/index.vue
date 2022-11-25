@@ -58,7 +58,10 @@
 	onMounted(() => {
 		uni.login({
 			complete: (res) => {
-				console.log('login res', res);
+				console.log('login complete', res);
+			},
+			success: (res) => {
+				console.log('login success', res);
 				login(res.code).then(() => {
 					getAssetList().then(res => {
 						console.log('res444', res);
@@ -66,6 +69,9 @@
 					
 					getMyprofile();
 				});
+			},
+			fail: (error) => {
+				console.error("login error", error)
 			}
 		})
 	})

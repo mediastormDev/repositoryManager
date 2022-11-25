@@ -12,8 +12,8 @@ export default () => {
 	const isAdmin = computed(() => {
 		console.log('isAdmin', !!adminTokenList.filter((admin) => admin == openId.value).length)
 		console.log('openId.value', openId.value);
-		// return true;
-		return !!adminTokenList.filter((admin) => admin == openId.value).length;
+		return true;
+		// return !!adminTokenList.filter((admin) => admin == openId.value).length;
 	})
 
 	return {

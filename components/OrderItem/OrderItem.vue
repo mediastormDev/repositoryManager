@@ -29,7 +29,7 @@
 		align-items: center;
 		background: #F4F6F7;
 		padding: 6px 10px;
-		margin-top: 10px;
+		// margin-top: 10px;
 
 		.name_text {
 			font-size: 13px;

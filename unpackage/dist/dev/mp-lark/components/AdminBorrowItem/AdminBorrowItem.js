@@ -16,6 +16,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   },
   setup(__props) {
     const props = __props;
+    const showListStatus = common_vendor.ref(false);
+    const switch2Change = (e) => {
+      showListStatus.value = e.detail.value;
+    };
     const onClickBorrow = common_vendor.lodash.exports.debounce((ticketid) => {
       common_vendor.uni.showLoading({
         title: "\u8BF7\u7A0D\u5019.."
@@ -28,6 +32,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         props.loadData();
       });
     }, 100);
+    const onClickBorrowAll = common_vendor.lodash.exports.debounce(async () => {
+      common_vendor.uni.showLoading({
+        title: "\u8BF7\u7A0D\u5019.."
+      });
+      let failList = [];
+      for (let item of props.borrowItems) {
+        try {
+          await common_apis_borrow.lendGear(item._id);
+        } catch (e) {
+          failList.push(item);
+        }
+      }
+      if (failList.length) {
+        common_vendor.uni.showModal({
+          title: "\u63D0\u793A",
+          content: `\u6709${failList.length}\u4EF6\u501F\u51FA\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u501F\u51FA`
+        });
+      }
+      props.loadData();
+    }, 100);
     common_vendor.onMounted(() => {
       console.log("admin item mounted", props.borrowItems);
     });
@@ -37,7 +61,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           info: __props.borrowItems[0],
           bgColor: "white"
         }),
-        b: common_vendor.f(__props.borrowItems, (borrow, k0, i0) => {
+        b: common_vendor.o(switch2Change),
+        c: common_vendor.o((...args) => common_vendor.unref(onClickBorrowAll) && common_vendor.unref(onClickBorrowAll)(...args)),
+        d: common_vendor.f(__props.borrowItems, (borrow, k0, i0) => {
           return common_vendor.e({
             a: "1e85eeb8-1-" + i0,
             b: common_vendor.p({
@@ -50,7 +76,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           } : {}, {
             e: borrow._id
           });
-        })
+        }),
+        e: showListStatus.value
       };
     };
   }
