@@ -1,10 +1,4 @@
 <template>
-	<!-- 	<view>
-		<view style="margin-top: 10px;" v-for="borrow in borrowList" :key="borrow._id">
-			<AdminReturnItemView :returnItem="borrow" :loadData="loadData" />
-		</view>
-	</view> -->
-
 	<AdminReturnItemView v-for="borrow in borrowList" :loadData="loadData" :key="borrow._id"
 		:borrowItems="borrow && borrow.borrows" />
 </template>
