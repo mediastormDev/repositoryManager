@@ -57,6 +57,12 @@ export const getTicketsAll = () => {
 	})
 }
 
+export const getTicketsHistory = () => {
+	return request('/api/ticket/history', {}, 'GET').then(res => {
+		return res;
+	})
+}
+
 
 export const removeGear = (ticketId, borrowId) => {
 	return request(`/api/ticket/${ticketId}/${borrowId}/remove`, {}, 'POST').then(res => {

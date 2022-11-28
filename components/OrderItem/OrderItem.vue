@@ -1,10 +1,18 @@
 <template>
 	<view class="order_item_view" v-if="info" :style="{backgroundColor: bgColor}">
 		<view class="name_text">{{info.nickname || ''}}</view>
-		<view class="content_text" v-if="info.lentAt">使用中：{{dayjs(info.lentAt).format('MM-DD HH:mm')}}</view>
-		<view class="content_text" v-else>已预约：{{dayjs(info.pendingLentAt).format('MM-DD HH:mm')}} -
-			{{dayjs(info.pendingReturnAt).format('MM-DD HH:mm')}}
-		</view>
+		<template v-if="!hideStatus">
+			<view class="content_text" v-if="info.lentAt">使用中：{{dayjs(info.lentAt).format('MM-DD HH:mm')}}</view>
+			<view class="content_text" v-else>已预约：{{dayjs(info.pendingLentAt).format('MM-DD HH:mm')}} -
+				{{dayjs(info.pendingReturnAt).format('MM-DD HH:mm')}}
+			</view>
+		</template>
+		<template v-else>
+			<view class="content_text">
+				{{dayjs(info.pendingLentAt).format('MM-DD HH:mm')}} 至
+				{{dayjs(info.pendingReturnAt).format('MM-DD HH:mm')}}
+			</view>
+		</template>
 	</view>
 </template>
 
@@ -16,6 +24,7 @@
 	import dayjs from 'dayjs';
 
 	const props = defineProps < {
+		hideStatus: Boolean,
 		bgColor ? : String,
 		info: any
 	} > ()

@@ -5,6 +5,7 @@
     "my-orders-view": "../../components/MyOrders/MyOrders",
     "my-returns-view": "../../components/MyReturns/MyReturns",
     "admin-returns-view": "../../components/AdminReturn/AdminReturn",
-    "admin-borrow-view": "../../components/AdminBorrow/AdminBorrow"
+    "admin-borrow-view": "../../components/AdminBorrow/AdminBorrow",
+    "admin-history": "../../components/AdminHistory/AdminHistory"
   }
 }

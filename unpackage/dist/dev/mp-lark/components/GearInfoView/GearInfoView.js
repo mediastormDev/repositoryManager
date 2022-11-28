@@ -8,6 +8,7 @@ require("../../common/apis/borrow.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "GearInfoView",
   props: {
+    showButton: { type: null, required: true },
     gear: { type: null, required: true },
     imageSize: { type: null, required: true }
   },

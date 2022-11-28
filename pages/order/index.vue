@@ -4,12 +4,14 @@
 		<view v-if="!isAdmin" @click="clickTabs(1)" class="tab" :class="{selected: tabsIndex === 1}">归还设备</view>
 		<view v-if="isAdmin" @click="clickTabs(2)" class="tab" :class="{selected: tabsIndex === 2}">出借申请</view>
 		<view v-if="isAdmin" @click="clickTabs(3)" class="tab" :class="{selected: tabsIndex === 3}">归还设备</view>
+		<view v-if="isAdmin" @click="clickTabs(4)" class="tab" :class="{selected: tabsIndex === 4}">历史记录</view>
 	</view>
 	<view>
 		<MyOrdersView ref="orderViewRef" v-show="tabsIndex === 0" />
 		<MyReturnsView ref="myreturnsRef" v-show="tabsIndex === 1" />
 		<AdminBorrowView ref="adminBorrowRef" v-show="tabsIndex === 2 " />
 		<AdminReturnsView ref="adminReturnsRef" v-show="tabsIndex === 3" />
+		<AdminHistory ref="adminReturnsRef" v-show="tabsIndex === 4" />
 	</view>
 </template>
 
@@ -21,6 +23,7 @@
 	import MyReturnsView from '@/components/MyReturns/MyReturns.vue';
 	import AdminReturnsView from '@/components/AdminReturn/AdminReturn.vue'
 	import AdminBorrowView from '@/components/AdminBorrow/AdminBorrow.vue';
+	import AdminHistory from '@/components/AdminHistory/AdminHistory.vue';
 	import {
 		onPullDownRefresh,
 		onShow

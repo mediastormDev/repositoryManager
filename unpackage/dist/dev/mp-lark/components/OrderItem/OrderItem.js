@@ -3,6 +3,7 @@ var common_vendor = require("../../common/vendor.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "OrderItem",
   props: {
+    hideStatus: { type: null, required: true },
     bgColor: { type: null, required: false },
     info: { type: null, required: true }
   },
@@ -13,14 +14,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: __props.info
       }, __props.info ? common_vendor.e({
         b: common_vendor.t(__props.info.nickname || ""),
-        c: __props.info.lentAt
+        c: !__props.hideStatus
+      }, !__props.hideStatus ? common_vendor.e({
+        d: __props.info.lentAt
       }, __props.info.lentAt ? {
-        d: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.lentAt).format("MM-DD HH:mm"))
+        e: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.lentAt).format("MM-DD HH:mm"))
       } : {
-        e: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.pendingLentAt).format("MM-DD HH:mm")),
-        f: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.pendingReturnAt).format("MM-DD HH:mm"))
+        f: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.pendingLentAt).format("MM-DD HH:mm")),
+        g: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.pendingReturnAt).format("MM-DD HH:mm"))
+      }) : {
+        h: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.pendingLentAt).format("MM-DD HH:mm")),
+        i: common_vendor.t(common_vendor.unref(common_vendor.dayjs)(__props.info.pendingReturnAt).format("MM-DD HH:mm"))
       }, {
-        g: __props.bgColor
+        j: __props.bgColor
       }) : {});
     };
   }

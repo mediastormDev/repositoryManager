@@ -26,6 +26,7 @@
 		GearStatusString
 	} from '@/composables/UseGear';
 	const props = defineProps < {
+		showButton: Boolean,
 		gear: Gear,
 		imageSize: String
 	} > ()

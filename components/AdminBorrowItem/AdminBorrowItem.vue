@@ -1,10 +1,10 @@
 <template>
 	<view class="my_return_item">
 		<view class="admin_return_view">
-			<OrderItem :info="borrowItems[0]" bgColor="white" />
+			<OrderItem :hideStatus="true" :info="borrowItems[0]" bgColor="white" />
 			<switch style="transform:scale(0.7)" @change="switch2Change" />
 		</view>
-		<button size="mini" class="return_btn" @click="onClickBorrowAll">一键借出</button>
+		<button v-if="!hideStatus" size="mini" class="return_btn" @click="onClickBorrowAll">一键借出</button>
 		<view v-show="showListStatus" class="top_view" v-for="borrow in borrowItems" :key="borrow._id">
 			<GearInfoView :gear="borrow.asset" imageSize="mini" />
 			<view v-if="borrow.asset.status !== 'INUSE'" style="text-align: right;"><button size="mini"
@@ -30,6 +30,7 @@
 	} from 'lodash';
 
 	const props = defineProps < {
+		hideStatus: Boolean,
 		borrowItems: any[],
 		loadData: Function
 	} > ()

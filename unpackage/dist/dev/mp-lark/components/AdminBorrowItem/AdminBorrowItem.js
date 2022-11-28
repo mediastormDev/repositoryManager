@@ -11,6 +11,7 @@ const OrderItem = () => "../OrderItem/OrderItem.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "AdminBorrowItem",
   props: {
+    hideStatus: { type: null, required: true },
     borrowItems: { type: Array, required: true },
     loadData: { type: Function, required: true }
   },
@@ -56,14 +57,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       console.log("admin item mounted", props.borrowItems);
     });
     return (_ctx, _cache) => {
-      return {
+      return common_vendor.e({
         a: common_vendor.p({
+          hideStatus: true,
           info: __props.borrowItems[0],
           bgColor: "white"
         }),
         b: common_vendor.o(switch2Change),
-        c: common_vendor.o((...args) => common_vendor.unref(onClickBorrowAll) && common_vendor.unref(onClickBorrowAll)(...args)),
-        d: common_vendor.f(__props.borrowItems, (borrow, k0, i0) => {
+        c: !__props.hideStatus
+      }, !__props.hideStatus ? {
+        d: common_vendor.o((...args) => common_vendor.unref(onClickBorrowAll) && common_vendor.unref(onClickBorrowAll)(...args))
+      } : {}, {
+        e: common_vendor.f(__props.borrowItems, (borrow, k0, i0) => {
           return common_vendor.e({
             a: "1e85eeb8-1-" + i0,
             b: common_vendor.p({
@@ -77,8 +82,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             e: borrow._id
           });
         }),
-        e: showListStatus.value
-      };
+        f: showListStatus.value
+      });
     };
   }
 });

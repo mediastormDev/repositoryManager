@@ -2,12 +2,13 @@
 var common_vendor = require("../../common/vendor.js");
 var composables_UseToken = require("../../composables/UseToken.js");
 if (!Math) {
-  (MyOrdersView + MyReturnsView + AdminBorrowView + AdminReturnsView)();
+  (MyOrdersView + MyReturnsView + AdminBorrowView + AdminReturnsView + AdminHistory)();
 }
 const MyOrdersView = () => "../../components/MyOrders/MyOrders.js";
 const MyReturnsView = () => "../../components/MyReturns/MyReturns.js";
 const AdminReturnsView = () => "../../components/AdminReturn/AdminReturn.js";
 const AdminBorrowView = () => "../../components/AdminBorrow/AdminBorrow.js";
+const AdminHistory = () => "../../components/AdminHistory/AdminHistory.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
@@ -60,22 +61,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         k: common_vendor.o(($event) => clickTabs(3)),
         l: tabsIndex.value === 3 ? 1 : ""
       } : {}, {
-        m: common_vendor.sr(orderViewRef, "6acf1b90-0", {
+        m: common_vendor.unref(isAdmin)
+      }, common_vendor.unref(isAdmin) ? {
+        n: common_vendor.o(($event) => clickTabs(4)),
+        o: tabsIndex.value === 4 ? 1 : ""
+      } : {}, {
+        p: common_vendor.sr(orderViewRef, "6acf1b90-0", {
           "k": "orderViewRef"
         }),
-        n: tabsIndex.value === 0,
-        o: common_vendor.sr(myreturnsRef, "6acf1b90-1", {
+        q: tabsIndex.value === 0,
+        r: common_vendor.sr(myreturnsRef, "6acf1b90-1", {
           "k": "myreturnsRef"
         }),
-        p: tabsIndex.value === 1,
-        q: common_vendor.sr(adminBorrowRef, "6acf1b90-2", {
+        s: tabsIndex.value === 1,
+        t: common_vendor.sr(adminBorrowRef, "6acf1b90-2", {
           "k": "adminBorrowRef"
         }),
-        r: tabsIndex.value === 2,
-        s: common_vendor.sr(adminReturnsRef, "6acf1b90-3", {
+        v: tabsIndex.value === 2,
+        w: common_vendor.sr(adminReturnsRef, "6acf1b90-3", {
           "k": "adminReturnsRef"
         }),
-        t: tabsIndex.value === 3
+        x: tabsIndex.value === 3,
+        y: common_vendor.sr(adminReturnsRef, "6acf1b90-4", {
+          "k": "adminReturnsRef"
+        }),
+        z: tabsIndex.value === 4
       });
     };
   }
